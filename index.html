@@ -8,3 +8,124 @@
 └── app.js       ← state + touch
   </body>
 </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Beacon</title>
+
+<style>
+/* ===== RESET ===== */
+* {
+  box-sizing: border-box;
+}
+
+/* ===== BASE ===== */
+body {
+  margin: 0;
+  padding: 20px;
+  background: #0a0a0a;
+  color: #ffffff;
+  font-family: "Courier New", monospace;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+/* ===== LAYOUT ===== */
+.container {
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+/* ===== PANELS ===== */
+.panel {
+  border: 1px solid #ffffff;
+  padding: 12px;
+  margin-bottom: 14px;
+}
+
+/* ===== TEXT ===== */
+.title {
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.label {
+  opacity: 0.85;
+}
+
+.item {
+  margin-left: 10px;
+}
+
+/* ===== MENU ICONS ===== */
+.cursor {
+  margin-right: 6px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- HEADER / BEACON -->
+  <div class="panel">
+    <div class="title">BEACON</div>
+    <div class="label">DAY: THURSDAY</div>
+    <div class="label">STATUS: AMBER</div>
+  </div>
+
+  <!-- STATS -->
+  <div class="panel">
+    <div class="title">STATS</div>
+    <div class="item">STEPS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6420</div>
+    <div class="item">CONDITION&nbsp;STABLE</div>
+    <br>
+    <div class="item">GIL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+$75</div>
+    <div class="item">BUFFER&nbsp;&nbsp;&nbsp;OK</div>
+  </div>
+
+  <!-- EQUIPPED TASKS -->
+  <div class="panel">
+    <div class="title">EQUIPPED TASKS</div>
+    <div class="item"><span class="cursor">▶</span>Deep Work Block</div>
+    <div class="item"><span class="cursor">▶</span>Client Follow-up</div>
+    <div class="item"><span class="cursor">▶</span>Errands</div>
+  </div>
+
+  <!-- RELICS -->
+  <div class="panel">
+    <div class="title">RELICS</div>
+    <div class="item">◉ Morning Gym</div>
+    <div class="item">◉ Notes Notebook</div>
+  </div>
+
+  <!-- TOOLS -->
+  <div class="panel">
+    <div class="title">TOOLS</div>
+    <div class="item">□ Timer</div>
+    <div class="item">□ Notes Template</div>
+  </div>
+
+  <!-- PREEMPTIVES -->
+  <div class="panel">
+    <div class="title">PREEMPTIVES</div>
+    <div class="item">▣ No meetings before 10</div>
+    <div class="item">▣ Phone on silent</div>
+  </div>
+
+  <!-- LEDGER -->
+  <div class="panel">
+    <div class="title">LEDGER</div>
+
+    <div class="item">INCOME&nbsp;&nbsp;&nbsp;&nbsp;+$120</div>
+    <div class="item">EXPENSES&nbsp;&nbsp;-$45</div>
+    <div class="item">BALANCE&nbsp;&nbsp;&nbsp;+$75</div>
+
+    <br>
+
+    <div class="label">TODAY</div>
+    <div class="item"><span
