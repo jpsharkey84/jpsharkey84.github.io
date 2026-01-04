@@ -1,184 +1,87 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Beacons – Menu Hub</title><style>
-/* ------------------ CORE THEME ------------------ */
+<title>Beacons – Menu Hub</title>
+<style>
 :root {
-  --bg-top: #0b1d33;            /* deep blue */
-  --bg-bottom: #f5f7fa;         /* soft white */
-  --mood-color: rgba(255,165,0,0.18); /* orange flow default */
-
+  --bg-top: #0b1d33;
+  --bg-bottom: #f5f7fa;
+  --mood-color: rgba(255,165,0,0.18);
   --panel-bg: rgba(255,255,255,0.08);
   --panel-border: rgba(255,255,255,0.55);
   --text-main: #ffffff;
   --text-dim: rgba(255,255,255,0.65);
 }
-
-* {
-  box-sizing: border-box;
-  font-family: "Trebuchet MS", "Verdana", sans-serif;
-}
-
-body {
-  margin: 0;
-  height: 100vh;
-  color: var(--text-main);
-  background:
-    linear-gradient(to bottom, var(--bg-top), var(--bg-bottom)),
-    var(--mood-color);
-  background-blend-mode: screen;
-  overflow: hidden;
-}
-
-/* ------------------ LAYOUT ------------------ */
-#app {
-  display: grid;
-  grid-template-columns: 240px 1fr;
-  height: 100vh;
-}
-
-/* ------------------ MENU PANEL ------------------ */
-#menu {
-  background: var(--panel-bg);
-  border-right: 1px solid var(--panel-border);
-  padding: 20px 14px;
-}
-
-.menu-title {
-  font-size: 14px;
-  letter-spacing: 2px;
-  margin-bottom: 20px;
-  color: var(--text-dim);
-}
-
-.menu-item {
-  padding: 10px 8px;
-  margin-bottom: 6px;
-  cursor: pointer;
-}
-
-.menu-item.active {
-  border-left: 4px solid white;
-  padding-left: 4px;
-}
-
-/* ------------------ MAIN PANEL ------------------ */
-#main {
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-/* ------------------ STATUS HEADER ------------------ */
-#status {
-  font-size: 13px;
-  color: var(--text-dim);
-}
-
-/* ------------------ BEACON ------------------ */
-#beacon {
-  align-self: flex-end;
-  width: 160px;
-  height: 160px;
-  border: 1px solid var(--panel-border);
-  background: radial-gradient(circle at center, rgba(255,165,0,0.45), rgba(255,165,0,0.05));
-  box-shadow: 0 0 20px rgba(255,165,0,0.3);
-  animation: breathe 6s ease-in-out infinite;
-}
-
-@keyframes breathe {
-  0%, 100% { opacity: 0.85; }
-  50% { opacity: 1; }
-}
-
-/* ------------------ TODAY SCREEN ------------------ */
-#today {
-  margin-top: 20px;
-}
-
-.log-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.2);
-}
-
-/* ------------------ BUTTONS ------------------ */
-button {
-  background: none;
-  border: 1px solid var(--panel-border);
-  color: white;
-  padding: 6px 10px;
-  cursor: pointer;
-}
-
-button:hover {
-  background: rgba(255,255,255,0.1);
-}
-</style></head>
-<body><div id="app">  <!-- MENU -->  <div id="menu">
-    <div class="menu-title">BEACONS</div>
-    <div class="menu-item active" onclick="switchScreen('today')">TODAY</div>
-    <div class="menu-item" onclick="switchScreen('logs')">LOGS</div>
-    <div class="menu-item" onclick="switchScreen('backpack')">BACKPACK</div>
-    <div class="menu-item" onclick="switchScreen('flow')">FLOW</div>
-    <div class="menu-item" onclick="switchScreen('money')">MONEY</div>
-  </div>  <!-- MAIN -->  <div id="main"><div id="status">
-  <div id="dateLine"></div>
-  <div id="moodLine">Mood: Orange Flow</div>
+body {margin:0;height:100vh;color:var(--text-main);background:linear-gradient(to bottom,var(--bg-top),var(--bg-bottom)),var(--mood-color);background-blend-mode:screen;overflow:hidden;font-family:"Trebuchet MS",Verdana,sans-serif;}
+#app{display:grid;grid-template-columns:240px 1fr;height:100vh;}
+#menu{background:var(--panel-bg);border-right:1px solid var(--panel-border);padding:20px 14px;}
+.menu-title{font-size:14px;letter-spacing:2px;margin-bottom:20px;color:var(--text-dim);}
+.menu-item{padding:10px 8px;margin-bottom:6px;cursor:pointer;}
+.menu-item.active{border-left:4px solid white;padding-left:4px;}
+#main{padding:24px;display:flex;flex-direction:column;justify-content:space-between;}
+#status{font-size:13px;color:var(--text-dim);}
+#beacon{align-self:flex-end;width:160px;height:160px;border:1px solid var(--panel-border);background:radial-gradient(circle at center,rgba(255,165,0,0.45),rgba(255,165,0,0.05));box-shadow:0 0 20px rgba(255,165,0,0.3);animation:breathe 6s ease-in-out infinite;}
+@keyframes breathe{0%,100%{opacity:0.85;}50%{opacity:1;}}
+#today{margin-top:20px;}
+.log-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.2);}
+button{background:none;border:1px solid var(--panel-border);color:white;padding:6px 10px;cursor:pointer;}
+button:hover{background:rgba(255,255,255,0.1);}
+</style>
+</head>
+<body>
+<div id="app">
+<div id="menu">
+<div class="menu-title">BEACONS</div>
+<div class="menu-item active" onclick="switchScreen('today')">TODAY</div>
+<div class="menu-item" onclick="switchScreen('logs')">LOGS</div>
+<div class="menu-item" onclick="switchScreen('backpack')">BACKPACK</div>
+<div class="menu-item" onclick="switchScreen('flow')">FLOW</div>
+<div class="menu-item" onclick="switchScreen('money')">MONEY</div>
 </div>
-
-<!-- TODAY VIEW -->
+<div id="main">
+<div id="status">
+<div id="dateLine"></div>
+<div id="moodLine">Mood: Orange Flow</div>
+</div>
 <div id="today">
-  <div class="log-row"><span>Work</span><span>Active</span></div>
-  <div class="log-row"><span>Weather</span><span>Rain</span></div>
-  <div class="log-row"><span>Money Flow</span><span>Steady</span></div>
-  <br />
-  <button onclick="saveToday()">Save Day</button>
+<div class="log-row"><span>Work</span><span>Active</span></div>
+<div class="log-row"><span>Weather</span><span>Rain</span></div>
+<div class="log-row"><span>Money Flow</span><span>Steady</span></div>
+<br />
+<button onclick="saveToday()">Save Day</button>
 </div>
-
-<!-- BEACON -->
 <div id="beacon"></div>
-
-  </div>
-</div><script>
-/* ------------------ DATA CORE ------------------ */
+</div>
+</div>
+<script>
 const STATE = {
   mood: 'Orange Flow',
   moodColor: 'rgba(255,165,0,0.18)',
-  today: {
-    Work: 'Active',
-    Weather: 'Rain',
-    Money: 'Steady'
-  }
+  today: { Work:'Active', Weather:'Rain', Money:'Steady' }
 };
-
-function init() {
+function init(){
   const now = new Date();
   document.getElementById('dateLine').innerText = now.toDateString();
   document.documentElement.style.setProperty('--mood-color', STATE.moodColor);
 }
-
-function saveToday() {
+function saveToday(){
   const logs = JSON.parse(localStorage.getItem('beaconLogs') || '[]');
-  logs.push({ date: new Date().toISOString(), state: STATE.today });
+  logs.push({ date:new Date().toISOString(), state:STATE.today });
   localStorage.setItem('beaconLogs', JSON.stringify(logs));
   flashBeacon();
 }
-
-function flashBeacon() {
-  const b = document.getElementById('beacon');
-  b.style.boxShadow = '0 0 30px white';
-  setTimeout(() => b.style.boxShadow = '0 0 20px rgba(255,165,0,0.3)', 600);
+function flashBeacon(){
+  const b=document.getElementById('beacon');
+  b.style.boxShadow='0 0 30px white';
+  setTimeout(()=>b.style.boxShadow='0 0 20px rgba(255,165,0,0.3)',600);
 }
-
-function switchScreen(name) {
-  document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+function switchScreen(name){
+  document.querySelectorAll('.menu-item').forEach(i=>i.classList.remove('active'));
   event.target.classList.add('active');
 }
-
 init();
-</script></body>
+</script>
+</body>
 </html>
