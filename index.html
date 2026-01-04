@@ -1,138 +1,63 @@
-<!DOCTYPE html>
- <html lang="en">
-  <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Beacon</title>
+<!DOCTYPE html><html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Beacons – Menu Hub</title><style>
+/* ------------------ CORE THEME ------------------ */
+:root {
+  --bg-top: #0b1d33;            /* deep blue */
+  --bg-bottom: #f5f7fa;         /* soft white */
+  --mood-color: rgba(255,165,0,0.18); /* orange flow default */
 
-<style>
-/* ===== RESET ===== */
+  --panel-bg: rgba(255,255,255,0.08);
+  --panel-border: rgba(255,255,255,0.55);
+  --text-main: #ffffff;
+  --text-dim: rgba(255,255,255,0.65);
+}
+
 * {
   box-sizing: border-box;
+  font-family: "Trebuchet MS", "Verdana", sans-serif;
 }
 
-/* ===== BASE ===== */
 body {
   margin: 0;
-  padding: 20px;
-  background:  light blue;
-  color: black;
-  font-family: "Courier New", monospace;
-  font-size: 16px;
-  line-height: 1.4;
+  height: 100vh;
+  color: var(--text-main);
+  background:
+    linear-gradient(to bottom, var(--bg-top), var(--bg-bottom)),
+    var(--mood-color);
+  background-blend-mode: screen;
+  overflow: hidden;
 }
 
-/* ===== LAYOUT ===== */
-.container {
-  max-width: 420px;
-  margin: 0 auto;
+/* ------------------ LAYOUT ------------------ */
+#app {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  height: 100vh;
 }
 
-/* ===== PANELS ===== */
-.panel {
-  border: 1px gray;
-  padding: 12px;
-  margin-bottom: 14px;
+/* ------------------ MENU PANEL ------------------ */
+#menu {
+  background: var(--panel-bg);
+  border-right: 1px solid var(--panel-border);
+  padding: 20px 14px;
 }
 
-/* ===== TEXT ===== */
-.title {
-  font-weight: bold;
-  text-transform: uppercase;
+.menu-title {
+  font-size: 14px;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+  color: var(--text-dim);
+}
+
+.menu-item {
+  padding: 10px 8px;
   margin-bottom: 6px;
+  cursor: pointer;
 }
 
-.label {
-  opacity: 0.85;
-}
-
-.item {
-  margin-left: 10px;
-}
-
-/* ===== MENU ICONS ===== */
-.cursor {
-  margin-right: 6px;
-}
-</style>
-</head>
-
-<body>
-
-<div class="container">
-
-  <!-- HEADER / BEACON -->
-  <div class="panel">
-    <div class="title">BEACON</div>
-    <div class="label">DAY: Sunday</div>
-    <div class="label">STATUS: orsngr</div>
-  </div>
-
-  <!-- STATS -->
-  <div class="panel">
-  <div class="title">MENU</div>
-
-  <details>
-    <summary>▶ VIEW DAY</summary>
-    <div class="item"> Work Block</div>
-    <div class="item">Client Follow-up</div>
-    <div class="item">scout </div>
-  </details>
-
-  <details>
-    <summary>▶ STATS</summary>
-    <div class="item">STEPS&nbsp;&nbsp;&nbsp;6420</div>
-    <div class="item">CONDITION&nbsp;STABLE</div>
-    <div class="item">GIL&nbsp;&nbsp;&nbsp;&nbsp;9999 g</div>
-    <div class="item">BUFFER&nbsp;OK</div>
-  </details>
-
-  <details>
-    <summary>▶ LEDGER</summary>
-    <div class="item">INCOME&nbsp;&nbsp;&nbsp;+$120</div>
-    <div class="item">EXPENSES&nbsp;-$45</div>
-    <div class="item">BALANCE&nbsp;&nbsp;+$75</div>
-  </details>
-
-  </div>
-  <!-- EQUIPPED TASKS -->
-  <div class="panel">
-    <div class="title">EQUIPPED TASKS</div>
-    <div class="item"><span class="cursor">▶</span>check emails</div>
-    <div class="item"><span class="cursor">▶</span>Client Follow-up</div>
-    <div class="item"><span class="cursor">▶</span>winterize</div>
-  </div>
-
-  <!-- RELICS -->
-  <div class="panel">
-    <div class="title">flow state</div>
-    <div class="item">◉ boat tickets</div>
-    <div class="item">◉ Notes Notebook</div>
-  </div>
-
-  <!-- TOOLS -->
-  <div class="panel">
-    <div class="title">TOOLS</div>
-    <div class="item">□ Timer</div>
-    <div class="item">□ Notes Template</div>
-  </div>
-
-  <!-- PREEMPTIVES -->
-  <div class="panel">
-    <div class="title">PREEMPTIVES</div>
-    <div class="item">▣ No meetings before 10</div>
-    <div class="item">▣ Phone on silent</div>
-  </div>
-
-  <!-- LEDGER -->
-  <div class="panel">
-    <div class="title">LEDGER</div>
-
-    <div class="item">INCOME&nbsp;&nbsp;&nbsp;&nbsp;+$120</div>
-    <div class="item">EXPENSES&nbsp;&nbsp;-$45</div>
-    <div class="item">BALANCE&nbsp;&nbsp;&nbsp;+$75</div>
-
-    <br>
-
-    <div class="label">TODAY</div>
-    <div class="item"><span
+.menu-item.active {
+  border-left: 4px solid white;
+  padding-left
