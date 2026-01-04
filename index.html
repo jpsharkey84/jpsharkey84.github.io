@@ -60,4 +60,125 @@ body {
 
 .menu-item.active {
   border-left: 4px solid white;
-  padding-left
+  padding-left: 4px;
+}
+
+/* ------------------ MAIN PANEL ------------------ */
+#main {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* ------------------ STATUS HEADER ------------------ */
+#status {
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+/* ------------------ BEACON ------------------ */
+#beacon {
+  align-self: flex-end;
+  width: 160px;
+  height: 160px;
+  border: 1px solid var(--panel-border);
+  background: radial-gradient(circle at center, rgba(255,165,0,0.45), rgba(255,165,0,0.05));
+  box-shadow: 0 0 20px rgba(255,165,0,0.3);
+  animation: breathe 6s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; }
+}
+
+/* ------------------ TODAY SCREEN ------------------ */
+#today {
+  margin-top: 20px;
+}
+
+.log-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
+/* ------------------ BUTTONS ------------------ */
+button {
+  background: none;
+  border: 1px solid var(--panel-border);
+  color: white;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: rgba(255,255,255,0.1);
+}
+</style></head>
+<body><div id="app">  <!-- MENU -->  <div id="menu">
+    <div class="menu-title">BEACONS</div>
+    <div class="menu-item active" onclick="switchScreen('today')">TODAY</div>
+    <div class="menu-item" onclick="switchScreen('logs')">LOGS</div>
+    <div class="menu-item" onclick="switchScreen('backpack')">BACKPACK</div>
+    <div class="menu-item" onclick="switchScreen('flow')">FLOW</div>
+    <div class="menu-item" onclick="switchScreen('money')">MONEY</div>
+  </div>  <!-- MAIN -->  <div id="main"><div id="status">
+  <div id="dateLine"></div>
+  <div id="moodLine">Mood: Orange Flow</div>
+</div>
+
+<!-- TODAY VIEW -->
+<div id="today">
+  <div class="log-row"><span>Work</span><span>Active</span></div>
+  <div class="log-row"><span>Weather</span><span>Rain</span></div>
+  <div class="log-row"><span>Money Flow</span><span>Steady</span></div>
+  <br />
+  <button onclick="saveToday()">Save Day</button>
+</div>
+
+<!-- BEACON -->
+<div id="beacon"></div>
+
+  </div>
+</div><script>
+/* ------------------ DATA CORE ------------------ */
+const STATE = {
+  mood: 'Orange Flow',
+  moodColor: 'rgba(255,165,0,0.18)',
+  today: {
+    Work: 'Active',
+    Weather: 'Rain',
+    Money: 'Steady'
+  }
+};
+
+function init() {
+  const now = new Date();
+  document.getElementById('dateLine').innerText = now.toDateString();
+  document.documentElement.style.setProperty('--mood-color', STATE.moodColor);
+}
+
+function saveToday() {
+  const logs = JSON.parse(localStorage.getItem('beaconLogs') || '[]');
+  logs.push({ date: new Date().toISOString(), state: STATE.today });
+  localStorage.setItem('beaconLogs', JSON.stringify(logs));
+  flashBeacon();
+}
+
+function flashBeacon() {
+  const b = document.getElementById('beacon');
+  b.style.boxShadow = '0 0 30px white';
+  setTimeout(() => b.style.boxShadow = '0 0 20px rgba(255,165,0,0.3)', 600);
+}
+
+function switchScreen(name) {
+  document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+init();
+</script></body>
+</html>
