@@ -3,183 +3,165 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Beacons – JRPG Hub</title>
+<title>Crono Trigger Style Menu Demo</title>
 <style>
-:root {
-  --bg-top:#0b1d33;
-  --bg-bottom:#f5f7fa;
-  --mood-color:rgba(255,165,0,0.18);
-  --panel-bg:rgba(255,255,255,0.08);
-  --panel-border:rgba(255,255,255,0.55);
-  --text-main:#ffffff;
-  --text-dim:rgba(255,255,255,0.65);
-}
-body{
-  margin:0;height:100vh;color:var(--text-main);
-  background:linear-gradient(to bottom,var(--bg-top),var(--bg-bottom)),var(--mood-color);
-  background-blend-mode:screen;
-  overflow:hidden;font-family:"Trebuchet MS",Verdana,sans-serif;
-}
-#app{display:grid;grid-template-columns:240px 1fr;height:100vh;}
-#menu{background:var(--panel-bg);border-right:1px solid var(--panel-border);padding:20px 14px;}
-.menu-title{font-size:14px;letter-spacing:2px;margin-bottom:20px;color:var(--text-dim);}
-.menu-item{padding:10px 8px;margin-bottom:6px;cursor:pointer;}
-.menu-item.active{border-left:4px solid white;padding-left:4px;}
-#main{padding:24px;display:flex;flex-direction:column;justify-content:space-between;}
-#status{font-size:13px;color:var(--text-dim);}
-#beacon{
-  align-self:flex-end;width:160px;height:160px;
-  border:1px solid var(--panel-border);
-  background:radial-gradient(circle at center,rgba(255,165,0,0.45),rgba(255,165,0,0.05));
-  box-shadow:0 0 20px rgba(255,165,0,0.3);
-  animation:breathe 6s ease-in-out infinite;
-  border-radius:12px;
-}
-@keyframes breathe{0%,100%{opacity:0.85;}50%{opacity:1;}}
-#today{margin-top:20px;}
-.log-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.2);}
-button{background:none;border:1px solid var(--panel-border);color:white;padding:6px 10px;cursor:pointer;}
-button:hover{background:rgba(255,255,255,0.1);}
-select{background:rgba(255,255,255,0.05);color:white;border:1px solid var(--panel-border);padding:2px 6px;border-radius:2px;}
-.option-btn{
-  padding:4px 8px;border:1px solid rgba(255,255,255,0.35);border-radius:3px;margin-right:4px;
-  cursor:pointer;transition:0.2s;
-}
-.option-btn:hover{background:rgba(255,255,255,0.15);}
-.option-btn.selected{background:rgba(255,255,255,0.1);}
+  body {
+    font-family: 'Verdana', sans-serif;
+    background: #111;
+    color: #eee;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  #menu {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 400px;
+  }
+
+  .card {
+    background-color: #222;
+    border: 2px solid #555;
+    padding: 10px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .face {
+    width: 64px;
+    height: 64px;
+    background-color: #888;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .info {
+    flex-grow: 1;
+  }
+
+  .stats, .equip {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+  }
+
+  .stats span, .equip span {
+    background-color: #333;
+    padding: 3px 6px;
+    border-radius: 5px;
+  }
+
+  .controls {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+  }
+
+  input[type=color] {
+    padding: 0;
+    border: none;
+    width: 40px;
+    height: 30px;
+    cursor: pointer;
+  }
+
+  button {
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+
 </style>
 </head>
 <body>
-<div id="app">
-  <div id="menu">
-    <div class="menu-title">BEACONS</div>
-    <div class="menu-item active" onclick="switchScreen('today')">TODAY</div>
-    <div class="menu-item" onclick="switchScreen('logs')">LOGS</div>
-    <div class="menu-item" onclick="switchScreen('backpack')">BACKPACK</div>
-    <div class="menu-item" onclick="switchScreen('flow')">FLOW</div>
-    <div class="menu-item" onclick="switchScreen('money')">MONEY</div>
-  </div>
-  <div id="main">
-    <div id="status">
-      <div id="dateLine"></div>
-      <div id="moodLine">Mood: Orange Flow</div>
-    </div>
-    <div id="today"></div>
-    <div id="beacon"></div>
-  </div>
+<div id="menu">
+  <!-- Character Cards -->
+</div>
+
+<div class="controls">
+  <button onclick="addCharacter()">Add Character</button>
+  <button onclick="saveData()">Save Menu</button>
+  <button onclick="loadData()">Load Menu</button>
+  <input type="color" id="colorPicker" value="#222" onchange="changeCardColor(this.value)">
 </div>
 
 <script>
-// ------------------ STATE & OPTIONS ------------------
-const OptionPool = {
-  Work: ['Active','Idle','Paused'],
-  Weather: ['Rain','Sun','Grey'],
-  Money: ['Steady','Flowing','Low']
-};
-let STATE = {
-  mood:'Orange Flow',
-  moodColor:'rgba(255,165,0,0.18)',
-  today:{ Work:'Active', Weather:'Rain', Money:'Steady' }
-};
+let menu = document.getElementById('menu');
+let characters = [];
 
-// ------------------ LOCAL STORAGE ------------------
-function getLogs(){return JSON.parse(localStorage.getItem('beaconLogs')||'{}');}
-function saveLogs(logs){localStorage.setItem('beaconLogs',JSON.stringify(logs));}
+// Default example character
+characters.push({
+  name: 'Crono',
+  stats: { HP: 100, MP: 50, ATK: 25 },
+  equip: { Weapon: 'Katana', Armor: 'Robe' },
+  color: '#222'
+});
 
-// ------------------ RENDER TODAY ------------------
-function renderToday(dateStr){
-  const todayDiv=document.getElementById('today');
-  todayDiv.innerHTML='';
+function renderMenu() {
+  menu.innerHTML = '';
+  characters.forEach((char, index) => {
+    let card = document.createElement('div');
+    card.className = 'card';
+    card.style.backgroundColor = char.color;
 
-  const logs=getLogs();
-  if(logs[dateStr]) STATE.today={...logs[dateStr]}; // load existing
+    let face = document.createElement('div');
+    face.className = 'face';
+    
+    let info = document.createElement('div');
+    info.className = 'info';
+    info.innerHTML = `<strong>${char.name}</strong>
+                      <div class="stats">HP: ${char.stats.HP} MP: ${char.stats.MP} ATK: ${char.stats.ATK}</div>
+                      <div class="equip">Weapon: ${char.equip.Weapon}, Armor: ${char.equip.Armor}</div>`;
 
-  for(let key in STATE.today){
-    const row=document.createElement('div'); row.className='log-row';
-
-    const label=document.createElement('span'); label.textContent=key;
-
-    const optionContainer=document.createElement('div'); optionContainer.style.display='flex';
-    OptionPool[key].forEach(opt=>{
-      const optDiv=document.createElement('div');
-      optDiv.textContent=opt;
-      optDiv.className='option-btn';
-      if(STATE.today[key]===opt) optDiv.classList.add('selected');
-      optDiv.onclick=()=>{
-        STATE.today[key]=opt;
-        renderToday(dateStr); // refresh selection highlight
-      };
-      optionContainer.appendChild(optDiv);
-    });
-
-    row.appendChild(label); row.appendChild(optionContainer);
-    todayDiv.appendChild(row);
-  }
-
-  // Save button
-  const saveBtn=document.createElement('button'); saveBtn.textContent='Save Day';
-  saveBtn.onclick=()=>{
-    const logs=getLogs(); logs[dateStr]={...STATE.today}; saveLogs(logs); flashBeacon();
-  };
-  todayDiv.appendChild(document.createElement('br')); todayDiv.appendChild(saveBtn);
+    card.appendChild(face);
+    card.appendChild(info);
+    menu.appendChild(card);
+  });
 }
 
-// ------------------ STATUS ------------------
-let currentDate=new Date();
-function updateStatus(date=currentDate){
-  const dateStr=date.toISOString().slice(0,10);
-  document.getElementById('dateLine').innerText=date.toDateString();
-  document.getElementById('moodLine').innerText='Mood: '+STATE.mood;
-  renderToday(dateStr);
+// Add new character
+function addCharacter() {
+  let name = prompt("Character Name:", "New Hero");
+  if(!name) return;
+  characters.push({
+    name,
+    stats: { HP: 50, MP: 30, ATK: 10 },
+    equip: { Weapon: 'None', Armor: 'None' },
+    color: '#222'
+  });
+  renderMenu();
 }
 
-// ------------------ BEACON ------------------
-function flashBeacon(){
-  const b=document.getElementById('beacon');
-  b.style.boxShadow='0 0 30px white';
-  setTimeout(()=>b.style.boxShadow='0 0 20px rgba(255,165,0,0.3)',600);
+// Change all card colors
+function changeCardColor(color) {
+  characters.forEach(c => c.color = color);
+  renderMenu();
 }
 
-// ------------------ MENU ------------------
-function switchScreen(name){
-  document.querySelectorAll('.menu-item').forEach(i=>i.classList.remove('active'));
-  event.target.classList.add('active');
-  if(name==='today') updateStatus(currentDate);
-  if(name==='logs') renderLogs();
+// Save to localStorage
+function saveData() {
+  localStorage.setItem('cronoMenu', JSON.stringify(characters));
+  alert('Menu Saved!');
 }
 
-// ------------------ LOGS ------------------
-function renderLogs(){
-  const todayDiv=document.getElementById('today');
-  todayDiv.innerHTML='<h4>Past / Future Logs</h4>';
-  const logs=getLogs();
-  for(let dateStr in logs){
-    const row=document.createElement('div'); row.className='log-row';
-    const dateLabel=document.createElement('span'); dateLabel.textContent=dateStr;
-    const editBtn=document.createElement('button'); editBtn.textContent='Edit';
-    editBtn.onclick=()=>{currentDate=new Date(dateStr); updateStatus(currentDate);}
-    row.appendChild(dateLabel); row.appendChild(editBtn);
-    todayDiv.appendChild(row);
+// Load from localStorage
+function loadData() {
+  let data = localStorage.getItem('cronoMenu');
+  if(data) {
+    characters = JSON.parse(data);
+    renderMenu();
+  } else {
+    alert('No save found!');
   }
 }
 
-// ------------------ AUTOMATIC MIDNIGHT ROLLOVER ------------------
-function scheduleRollover(){
-  const now=new Date();
-  const msUntilMidnight=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1,0,0,1)-now;
-  setTimeout(()=>{
-    currentDate=new Date(); updateStatus(currentDate);
-    scheduleRollover();
-  },msUntilMidnight);
-}
-
-// ------------------ INIT ------------------
-function init(){
-  document.documentElement.style.setProperty('--mood-color',STATE.moodColor);
-  updateStatus(currentDate);
-  scheduleRollover();
-}
-init();
+// Initial render
+renderMenu();
 </script>
 </body>
 </html>
