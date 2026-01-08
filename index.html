@@ -3,165 +3,325 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Crono Trigger Style Menu Demo</title>
+<title>Beacons Beta - FF Style</title>
 <style>
-  body {
-    font-family: 'Verdana', sans-serif;
-    background: #111;
-    color: #eee;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
-    padding: 20px;
-  }
+/* ----------------- GLOBAL STYLES ----------------- */
+:root {
+  --bg-top:#0b1d33;            /* Top gradient color */
+  --bg-bottom:#f5f7fa;         /* Bottom gradient color */
+  --mood-color:rgba(255,165,0,0.18); /* Default mood overlay */
+  --panel-bg:rgba(0,0,0,0.35); /* FF-style panel bg */
+  --panel-border:rgba(255,255,255,0.55);
+  --panel-shadow:rgba(0,0,0,0.6);
+  --text-main:#ffffff;
+  --text-dim:rgba(255,255,255,0.65);
+  --highlight-color:rgba(255,255,255,0.15);
+}
+body {
+  margin:0; height:100vh;
+  font-family:"Trebuchet MS",Verdana,sans-serif;
+  color:var(--text-main);
+  background:linear-gradient(to bottom,var(--bg-top),var(--bg-bottom)),var(--mood-color);
+  background-blend-mode:screen;
+  overflow:hidden;
+}
+#app {
+  display:grid;
+  grid-template-columns:240px 1fr;
+  height:100vh;
+}
 
-  #menu {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    width: 400px;
-  }
+/* ----------------- MENU ----------------- */
+#menu {
+  background:var(--panel-bg);
+  border-right:1px solid var(--panel-border);
+  padding:20px 14px;
+}
+.menu-title { font-size:14px; letter-spacing:2px; margin-bottom:20px; color:var(--text-dim);}
+.menu-item {
+  padding:10px 8px;
+  margin-bottom:6px;
+  cursor:pointer;
+  border-left:4px solid transparent;
+  transition:0.3s;
+}
+.menu-item.active{
+  border-left:4px solid white;
+  background:var(--highlight-color);
+}
+.menu-item:hover{ background:var(--highlight-color); }
 
-  .card {
-    background-color: #222;
-    border: 2px solid #555;
-    padding: 10px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
+/* ----------------- MAIN AREA ----------------- */
+#main { 
+  padding:24px; 
+  display:flex; 
+  flex-direction:column; 
+  justify-content:flex-start;
+  overflow-y:auto;
+}
+#status { font-size:13px; color:var(--text-dim);}
+#beacon {
+  align-self:flex-end; width:160px; height:160px;
+  border:2px solid var(--panel-border);
+  background:radial-gradient(circle at center,rgba(255,165,0,0.45),rgba(255,165,0,0.05));
+  box-shadow:0 0 20px rgba(255,165,0,0.3);
+  animation:breathe 6s ease-in-out infinite;
+  border-radius:12px;
+  margin-top:20px;
+}
+@keyframes breathe{0%,100%{opacity:0.85;}50%{opacity:1;}}
 
-  .face {
-    width: 64px;
-    height: 64px;
-    background-color: #888;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
+/* ----------------- DAY PANELS ----------------- */
+.day-panel{
+  background:var(--panel-bg);
+  border:1px solid var(--panel-border);
+  border-radius:10px;
+  box-shadow:0 4px 12px var(--panel-shadow);
+  margin-top:16px;
+  padding:12px 14px;
+  transition:0.2s;
+}
+.day-panel:hover{box-shadow:0 6px 18px var(--panel-shadow); border-color:white;}
 
-  .info {
-    flex-grow: 1;
-  }
+.day-panel-title{
+  font-weight:bold;
+  margin-bottom:8px;
+  color:var(--text-main);
+  font-size:14px;
+  text-shadow:0 1px 2px rgba(0,0,0,0.6);
+}
 
-  .stats, .equip {
-    display: flex;
-    gap: 10px;
-    margin-top: 5px;
-  }
+/* ----------------- LOG ROW ----------------- */
+.log-row{
+  display:flex;
+  justify-content:space-between;
+  padding:6px 0;
+  border-bottom:1px solid rgba(255,255,255,0.2);
+}
+.option-btn{
+  padding:4px 8px;
+  border:1px solid rgba(255,255,255,0.35);
+  border-radius:3px;
+  margin-right:4px;
+  cursor:pointer;
+  transition:0.2s;
+  font-size:12px;
+}
+.option-btn:hover{background:var(--highlight-color);}
+.option-btn.selected{background:rgba(255,255,255,0.12); border-color:white;}
 
-  .stats span, .equip span {
-    background-color: #333;
-    padding: 3px 6px;
-    border-radius: 5px;
-  }
+textarea{
+  background:rgba(255,255,255,0.05);
+  color:white;
+  border:1px solid rgba(255,255,255,0.4);
+  padding:6px;
+  width:100%;
+  resize:none;
+  border-radius:4px;
+}
 
-  .controls {
-    margin-top: 20px;
-    display: flex;
-    gap: 10px;
-  }
+/* BUTTONS */
+button{
+  background:none;
+  border:1px solid var(--panel-border);
+  color:white;
+  padding:6px 10px;
+  cursor:pointer;
+  border-radius:4px;
+  margin-top:8px;
+}
+button:hover{background:var(--highlight-color);}
 
-  input[type=color] {
-    padding: 0;
-    border: none;
-    width: 40px;
-    height: 30px;
-    cursor: pointer;
-  }
-
-  button {
-    padding: 5px 10px;
-    cursor: pointer;
-  }
-
+/* ----------------- END STYLES ----------------- */
 </style>
 </head>
 <body>
-<div id="menu">
-  <!-- Character Cards -->
-</div>
+<div id="app">
+  <!-- LEFT MENU -->
+  <div id="menu">
+    <div class="menu-title">BEACONS</div>
+    <div class="menu-item active" onclick="switchScreen('today')">TODAY</div>
+    <div class="menu-item" onclick="switchScreen('logs')">LOGS</div>
+    <div class="menu-item" onclick="switchScreen('backpack')">BACKPACK</div>
+    <div class="menu-item" onclick="switchScreen('flow')">FLOW</div>
+    <div class="menu-item" onclick="switchScreen('money')">MONEY</div>
+  </div>
 
-<div class="controls">
-  <button onclick="addCharacter()">Add Character</button>
-  <button onclick="saveData()">Save Menu</button>
-  <button onclick="loadData()">Load Menu</button>
-  <input type="color" id="colorPicker" value="#222" onchange="changeCardColor(this.value)">
+  <!-- MAIN AREA -->
+  <div id="main">
+    <div id="status">
+      <div id="dateLine"></div>
+      <div id="moodLine"></div>
+    </div>
+    <div id="today"></div>
+    <div id="beacon"></div>
+  </div>
 </div>
 
 <script>
-let menu = document.getElementById('menu');
-let characters = [];
+/* ----------------- DATA & STATE ----------------- */
+const OptionPool = {
+  Work: ['Active','Idle','Paused'],
+  Weather: ['Rain','Sun','Grey'],
+  Money: ['Steady','Flowing','Low']
+};
+let STATE = {
+  mood:'Orange Flow', 
+  moodColor:'rgba(255,165,0,0.18)',
+  today:{ Work:'Active', Weather:'Rain', Money:'Steady' },
+  tasks:[],
+  notes:'',
+  stats:{ hours:0, steps:0, money:0 }
+};
 
-// Default example character
-characters.push({
-  name: 'Crono',
-  stats: { HP: 999, MP: 99, ATK: 255 },
-  equip: { Weapon: 'Rainbow', Armor: 'Nova Armor' , Head: 'time hat' , Accesory: 'Green Dream' },
-  color: '#222'
-});
+/* ----------------- LOCAL STORAGE ----------------- */
+function getLogs(){ return JSON.parse(localStorage.getItem('beaconLogs')||'{}'); }
+function saveLogs(logs){ localStorage.setItem('beaconLogs',JSON.stringify(logs)); }
 
-function renderMenu() {
-  menu.innerHTML = '';
-  characters.forEach((char, index) => {
-    let card = document.createElement('div');
-    card.className = 'card';
-    card.style.backgroundColor = char.color;
+/* ----------------- RENDER TODAY ----------------- */
+function renderToday(dateStr){
+  const todayDiv=document.getElementById('today');
+  todayDiv.innerHTML='';
 
-    let face = document.createElement('div');
-    face.className = 'face';
-    
-    let info = document.createElement('div');
-    info.className = 'info';
-    info.innerHTML = `<strong>${char.name}</strong>
-                      <div class="stats">HP: ${char.stats.HP} MP: ${char.stats.MP} ATK: ${char.stats.ATK}</div>
-                      <div class="equip">Weapon: ${char.equip.Weapon}, Armor: ${char.equip.Armor}</div>`;
+  const logs=getLogs();
+  if(logs[dateStr]){
+    STATE.today = {...(logs[dateStr].core||STATE.today)};
+    STATE.notes = logs[dateStr].notes||'';
+    STATE.tasks = logs[dateStr].tasks||[];
+    STATE.stats = logs[dateStr].stats||{hours:0,steps:0,money:0};
+  }
 
-    card.appendChild(face);
-    card.appendChild(info);
-    menu.appendChild(card);
-  });
+  // --- CORE OPTIONS PANEL ---
+  const corePanel=document.createElement('div'); corePanel.className='day-panel';
+  const coreTitle=document.createElement('div'); coreTitle.className='day-panel-title'; coreTitle.textContent='Core Options';
+  corePanel.appendChild(coreTitle);
+
+  for(let key in STATE.today){
+    const row=document.createElement('div'); row.className='log-row';
+    const label=document.createElement('span'); label.textContent=key;
+
+    const optionContainer=document.createElement('div'); optionContainer.style.display='flex';
+    OptionPool[key].forEach(opt=>{
+      const optDiv=document.createElement('div');
+      optDiv.textContent=opt;
+      optDiv.className='option-btn';
+      if(STATE.today[key]===opt) optDiv.classList.add('selected');
+      optDiv.onclick=()=>{ STATE.today[key]=opt; renderToday(dateStr); };
+      optionContainer.appendChild(optDiv);
+    });
+
+    row.appendChild(label); row.appendChild(optionContainer);
+    corePanel.appendChild(row);
+  }
+  todayDiv.appendChild(corePanel);
+
+  // --- NOTES PANEL ---
+  const notesPanel=document.createElement('div'); notesPanel.className='day-panel';
+  const notesTitle=document.createElement('div'); notesTitle.className='day-panel-title'; notesTitle.textContent='Notes';
+  notesPanel.appendChild(notesTitle);
+  const notesBox=document.createElement('textarea');
+  notesBox.value = STATE.notes;
+  notesBox.onchange = () => { STATE.notes = notesBox.value; };
+  notesPanel.appendChild(notesBox);
+  todayDiv.appendChild(notesPanel);
+
+  // --- TASKS PANEL ---
+  const tasksPanel=document.createElement('div'); tasksPanel.className='day-panel';
+  const tasksTitle=document.createElement('div'); tasksTitle.className='day-panel-title'; tasksTitle.textContent='Tasks (placeholder)';
+  tasksPanel.appendChild(tasksTitle);
+  const tasksBox=document.createElement('textarea');
+  tasksBox.value = STATE.tasks.join(', ');
+  tasksBox.onchange = () => { STATE.tasks = tasksBox.value.split(',').map(t=>t.trim()); };
+  tasksPanel.appendChild(tasksBox);
+  todayDiv.appendChild(tasksPanel);
+
+  // --- STATS PANEL ---
+  const statsPanel=document.createElement('div'); statsPanel.className='day-panel';
+  const statsTitle=document.createElement('div'); statsTitle.className='day-panel-title'; statsTitle.textContent='Stats';
+  statsPanel.appendChild(statsTitle);
+  const statsBox=document.createElement('textarea');
+  statsBox.value = `Hours:${STATE.stats.hours}, Steps:${STATE.stats.steps}, Money:${STATE.stats.money}`;
+  statsBox.onchange = () => {
+    const parts = statsBox.value.split(',');
+    STATE.stats.hours = parseInt(parts[0].split(':')[1])||0;
+    STATE.stats.steps = parseInt(parts[1].split(':')[1])||0;
+    STATE.stats.money = parseInt(parts[2].split(':')[1])||0;
+  };
+  statsPanel.appendChild(statsBox);
+  todayDiv.appendChild(statsPanel);
+
+  // --- SAVE BUTTON ---
+  const saveBtn=document.createElement('button'); saveBtn.textContent='Save Day';
+  saveBtn.onclick=()=>{
+    const logs=getLogs();
+    logs[dateStr] = {
+      core: {...STATE.today},
+      notes: STATE.notes,
+      tasks: STATE.tasks,
+      stats: STATE.stats
+    };
+    saveLogs(logs);
+    flashBeacon();
+  };
+  todayDiv.appendChild(saveBtn);
 }
 
-// Add new character
-function addCharacter() {
-  let name = prompt("Character Name:", "New Hero");
-  if(!name) return;
-  characters.push({
-    name,
-    stats: { HP: 50, MP: 30, ATK: 10 },
-    equip: { Weapon: 'None', Armor: 'None' },
-    color: '#222'
-  });
-  renderMenu();
+/* ----------------- STATUS ----------------- */
+let currentDate=new Date();
+function updateStatus(date=currentDate){
+  const dateStr=date.toISOString().slice(0,10);
+  document.getElementById('dateLine').innerText=date.toDateString();
+  document.getElementById('moodLine').innerText='Mood: '+STATE.mood;
+  renderToday(dateStr);
 }
 
-// Change all card colors
-function changeCardColor(color) {
-  characters.forEach(c => c.color = color);
-  renderMenu();
+/* ----------------- BEACON ----------------- */
+function flashBeacon(){
+  const b=document.getElementById('beacon');
+  b.style.boxShadow='0 0 30px white';
+  setTimeout(()=>b.style.boxShadow='0 0 20px rgba(255,165,0,0.3)',600);
 }
 
-// Save to localStorage
-function saveData() {
-  localStorage.setItem('cronoMenu', JSON.stringify(characters));
-  alert('Menu Saved!');
+/* ----------------- MENU ----------------- */
+function switchScreen(name){
+  document.querySelectorAll('.menu-item').forEach(i=>i.classList.remove('active'));
+  event.target.classList.add('active');
+  if(name==='today') updateStatus(currentDate);
+  if(name==='logs') renderLogs();
 }
 
-// Load from localStorage
-function loadData() {
-  let data = localStorage.getItem('cronoMenu');
-  if(data) {
-    characters = JSON.parse(data);
-    renderMenu();
-  } else {
-    alert('No save found!');
+/* ----------------- LOGS ----------------- */
+function renderLogs(){
+  const todayDiv=document.getElementById('today');
+  todayDiv.innerHTML='<h4>Past / Future Logs</h4>';
+  const logs=getLogs();
+  for(let dateStr in logs){
+    const row=document.createElement('div'); row.className='log-row';
+    const dateLabel=document.createElement('span'); dateLabel.textContent=dateStr;
+    const editBtn=document.createElement('button'); editBtn.textContent='Edit';
+    editBtn.onclick=()=>{ currentDate=new Date(dateStr); updateStatus(currentDate); }
+    row.appendChild(dateLabel); row.appendChild(editBtn);
+    todayDiv.appendChild(row);
   }
 }
 
-// Initial render
-renderMenu();
+/* ----------------- AUTOMATIC MIDNIGHT ROLLOVER ----------------- */
+function scheduleRollover(){
+  const now=new Date();
+  const msUntilMidnight=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1,0,0,1)-now;
+  setTimeout(()=>{
+    currentDate=new Date(); updateStatus(currentDate);
+    scheduleRollover();
+  },msUntilMidnight);
+}
+
+/* ----------------- INIT ----------------- */
+function init(){
+  document.documentElement.style.setProperty('--mood-color',STATE.moodColor);
+  updateStatus(currentDate);
+  scheduleRollover();
+}
+init();
 </script>
 </body>
-</html>
+  </html>
