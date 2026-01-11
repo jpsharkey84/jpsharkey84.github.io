@@ -1,0 +1,163 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>JRPG Master Engine v2.0</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{background:#080b12;color:#eaeaea;font-family:monospace;margin:0}
+h1{padding:8px;color:#9bb7ff}
+.container{display:grid;grid-template-columns:240px 240px 1fr 360px;gap:8px;padding:8px}
+.panel{border:2px solid #3a5cff;padding:8px}
+select,button,textarea{width:100%;margin-top:4px;background:#111;color:#fff;border:1px solid #555}
+.stat{display:flex;justify-content:space-between}
+.small{font-size:11px;color:#aaa}
+textarea{height:200px}
+</style>
+</head>
+<body>
+<h1>JRPG Master Engine v2.0</h1>
+<div class="small" style="padding-left:8px">Final Fantasy I–XVI • FFT • Chrono Trigger • Chrono Cross • Offline • Persistent</div><div class="container"><div class="panel">
+<h3>Character</h3>
+<select id="charSel"></select>
+<select id="jobSel"></select>
+<button onclick="changeJob()">Change Job</button>
+<button onclick="saveGame()">Save</button>
+<button onclick="loadGame()">Load</button>
+<div id="charInfo"></div>
+</div><div class="panel">
+<h3>Equipment</h3>
+<select id="equipSel"></select>
+<button onclick="equipItem()">Equip</button>
+<button onclick="unequipItem()">Unequip</button>
+<div id="equipInfo"></div>
+</div><div class="panel">
+<h3>Stats</h3>
+<div id="stats"></div>
+<h3>Abilities</h3>
+<div id="abilities"></div>
+</div><div class="panel">
+<h3>Master DB Editor</h3>
+<textarea id="editor"></textarea>
+<button onclick="applyEdit()">Apply DB Edit</button>
+<div class="small">Direct JSON edit – everything feeds from here</div>
+</div></div><script>
+/************************
+ MASSIVE MASTER DATABASE
+************************/
+let DB={
+characters:{
+ cloud:{name:"Cloud",game:"FF7",job:"SOLDIER",level:20,base:{hp:1200,mp:300,str:18,mag:14,def:12,spd:12},equip:{weapon:null,armor:null,accessory:null},materia:[],espers:[]},
+ terra:{name:"Terra",game:"FF6",job:"Mage",level:18,base:{hp:950,mp:420,str:10,mag:20,def:11,spd:13},equip:{weapon:null,armor:null,accessory:null},espers:["ifrit"]},
+ bartz:{name:"Bartz",game:"FF5",job:"Freelancer",level:15,base:{hp:1050,mp:220,str:14,mag:12,def:12,spd:14},equip:{weapon:null,armor:null,accessory:null}},
+ ramza:{name:"Ramza",game:"FFT",job:"Squire",level:10,base:{hp:800,mp:120,str:13,mag:10,def:11,spd:11},equip:{weapon:null,armor:null,accessory:null}},
+ crono:{name:"Crono",game:"Chrono Trigger",job:"Swordsman",level:20,base:{hp:900,mp:120,str:16,mag:10,def:12,spd:15},equip:{weapon:null,armor:null,accessory:null},techs:["Cyclone","Lightning","Luminaire"]}
+},
+
+jobs:{
+ Freelancer:{bonus:{}},
+ Fighter:{bonus:{str:3,def:2}},
+ Knight:{bonus:{str:4,def:3}},
+ Thief:{bonus:{spd:4}},
+ Monk:{bonus:{str:5,hp:150}},
+ Dragoon:{bonus:{str:3,spd:3}},
+ Mage:{bonus:{mag:4,mp:80}},
+ BlackMage:{bonus:{mag:6,mp:120}},
+ WhiteMage:{bonus:{mp:100}},
+ TimeMage:{bonus:{spd:2,mp:60}},
+ Summoner:{bonus:{mag:5}},
+ SOLDIER:{bonus:{str:2,mag:2}},
+ Squire:{bonus:{str:1}},
+ Swordsman:{bonus:{str:3,spd:1}}
+},
+
+equipment:{
+ buster:{name:"Buster Sword",slot:"weapon",stats:{str:5}},
+ excalibur:{name:"Excalibur",slot:"weapon",stats:{str:10,spd:2}},
+ masamune:{name:"Masamune",slot:"weapon",stats:{str:8,spd:4}},
+ mythrilSword:{name:"Mythril Sword",slot:"weapon",stats:{str:3}},
+ bronzeArmor:{name:"Bronze Armor",slot:"armor",stats:{hp:200,def:2}},
+ mythrilArmor:{name:"Mythril Armor",slot:"armor",stats:{hp:350,def:4}},
+ genjiArmor:{name:"Genji Armor",slot:"armor",stats:{hp:500,def:6}},
+ powerRing:{name:"Power Ring",slot:"accessory",stats:{str:2}},
+ magicRing:{name:"Magic Ring",slot:"accessory",stats:{mag:3}},
+ speedBoots:{name:"Speed Boots",slot:"accessory",stats:{spd:3}}
+},
+
+materia:{
+ fire:{name:"Fire",type:"magic",stats:{mag:2},growth:1},
+ fira:{name:"Fira",type:"magic",stats:{mag:3},growth:2},
+ firaga:{name:"Firaga",type:"magic",stats:{mag:4},growth:3},
+ ice:{name:"Ice",type:"magic",stats:{mag:2},growth:1},
+ cure:{name:"Cure",type:"support",stats:{},growth:1},
+ haste:{name:"Haste",type:"time",stats:{spd:1},growth:2}
+},
+
+espers:{
+ ifrit:{name:"Ifrit",stats:{str:3},apBonus:{str:1},summon:"Fire"},
+ shiva:{name:"Shiva",stats:{mag:3},apBonus:{mag:1},summon:"Ice"},
+ ramuh:{name:"Ramuh",stats:{mag:4},apBonus:{mag:2},summon:"Lightning"}
+},
+
+techs:{
+ Cyclone:{power:8,element:"wind"},
+ Lightning:{power:10,element:"lightning"},
+ Luminaire:{power:25,element:"light"}
+}
+};
+
+/************************
+ UI LOGIC
+************************/
+const charSel=document.getElementById('charSel');
+const jobSel=document.getElementById('jobSel');
+const equipSel=document.getElementById('equipSel');
+const statsDiv=document.getElementById('stats');
+const abilDiv=document.getElementById('abilities');
+const infoDiv=document.getElementById('charInfo');
+const equipInfo=document.getElementById('equipInfo');
+const editor=document.getElementById('editor');
+
+function init(){
+ charSel.innerHTML=''; jobSel.innerHTML=''; equipSel.innerHTML='';
+ Object.keys(DB.characters).forEach(id=>{let o=document.createElement('option');o.value=id;o.textContent=DB.characters[id].name;charSel.appendChild(o)});
+ Object.keys(DB.jobs).forEach(j=>{let o=document.createElement('option');o.value=j;o.textContent=j;jobSel.appendChild(o)});
+ Object.keys(DB.equipment).forEach(id=>{let o=document.createElement('option');o.value=id;o.textContent=DB.equipment[id].name;equipSel.appendChild(o)});
+ editor.value=JSON.stringify(DB,null,2);
+ render();
+}
+
+charSel.onchange=render;
+
+function changeJob(){DB.characters[charSel.value].job=jobSel.value;render();}
+function equipItem(){const c=DB.characters[charSel.value];const e=DB.equipment[equipSel.value];c.equip[e.slot]=e;render();}
+function unequipItem(){const c=DB.characters[charSel.value];const e=DB.equipment[equipSel.value];c.equip[e.slot]=null;render();}
+
+function render(){
+ const c=DB.characters[charSel.value];
+ infoDiv.innerHTML=`<b>${c.name}</b><br>${c.game}<br>Lv ${c.level}<br>Job: ${c.job}`;
+ let final={...c.base};
+ if(DB.jobs[c.job]) for(const s in DB.jobs[c.job].bonus) final[s]=(final[s]||0)+DB.jobs[c.job].bonus[s];
+ Object.values(c.equip).forEach(eq=>{if(eq)for(const s in eq.stats)final[s]+=eq.stats[s]});
+ statsDiv.innerHTML='';
+ for(const s in final) statsDiv.innerHTML+=`<div class='stat'><span>${s}</span><span>${final[s]}</span></div>`;
+ abilDiv.innerHTML='';
+ if(c.techs) abilDiv.innerHTML+=`Techs: ${c.techs.join(', ')}<br>`;
+ if(c.materia) abilDiv.innerHTML+=`Materia Slots: ${c.materia.length}<br>`;
+ if(c.espers) abilDiv.innerHTML+=`Espers: ${c.espers.join(', ')}<br>`;
+ equipInfo.innerHTML='Equipped:<br>'+Object.entries(c.equip).map(e=>`${e[0]}: ${e[1]?e[1].name:'None'}`).join('<br>');
+}
+
+/************************
+ SAVE / LOAD
+************************/
+function saveGame(){localStorage.setItem('JRPG_DB_V2',JSON.stringify(DB));alert('Saved');}
+function loadGame(){const d=localStorage.getItem('JRPG_DB_V2');if(d){DB=JSON.parse(d);init();alert('Loaded');}}
+
+/************************
+ EDITOR
+************************/
+function applyEdit(){try{DB=JSON.parse(editor.value);init();}catch(e){alert('Invalid JSON');}}
+
+init();
+</script></body>
+</html>
