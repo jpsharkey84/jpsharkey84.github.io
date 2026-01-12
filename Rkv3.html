@@ -1,0 +1,145 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>JRPG Master Engine – Expanded Edition</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+:root{
+  --bg:#070a11;--panel:#0f1524;--border:#3a5cff;--accent:#8fb1ff;--text:#eaeaea
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:monospace}
+h1{margin:0;padding:12px;color:var(--accent)}
+header{border-bottom:2px solid var(--border)}
+.app{display:grid;grid-template-columns:280px 300px 1fr 420px;gap:12px;padding:12px}
+.panel{background:var(--panel);border:2px solid var(--border);padding:12px;border-radius:6px}
+.panel h2{margin-top:0;color:var(--accent)}
+select,button,textarea,input{width:100%;margin-top:6px;background:#111;color:#fff;border:1px solid #555;padding:6px;border-radius:4px}
+button{cursor:pointer}
+.stat{display:flex;justify-content:space-between;padding:2px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.small{font-size:11px;color:#aaa}
+.badge{display:inline-block;border:1px solid #555;padding:2px 6px;margin:2px;border-radius:4px;font-size:11px}
+textarea{height:260px}
+</style>
+</head>
+<body>
+<header>
+<h1>JRPG Master Engine</h1>
+<div class="small" style="padding:0 12px 8px">Final Fantasy I–XVI • FFT • Chrono Trigger • Fully Editable Data-Driven System</div>
+</header><div class="app"><!-- CHARACTER / PARTY --><div class="panel">
+<h2>Character</h2>
+<select id="charSel"></select>
+<label>Job</label>
+<select id="jobSel"></select>
+<button onclick="changeJob()">Change Job</button>
+<div id="charInfo" class="small"></div>
+<button onclick="saveGame()">Save</button>
+<button onclick="loadGame()">Load</button>
+</div><!-- EQUIPMENT --><div class="panel">
+<h2>Equipment</h2>
+<select id="equipSel"></select>
+<div class="grid">
+<button onclick="equipItem()">Equip</button>
+<button onclick="unequipItem()">Unequip</button>
+</div>
+<div id="equipInfo" class="small"></div>
+</div><!-- STATS / ABILITIES --><div class="panel">
+<h2>Stats</h2>
+<div id="stats"></div>
+<h2>Abilities</h2>
+<div id="abilities"></div>
+</div><!-- DATABASE EDITOR --><div class="panel">
+<h2>Master Database Editor</h2>
+<div class="small">Everything in the game lives here</div>
+<textarea id="editor"></textarea>
+<button onclick="applyEdit()">Apply Changes</button>
+</div></div><script>
+/**********************
+ MASSIVE DATA SET – EXPANDED
+**********************/
+let DB={
+characters:{
+ cloud:{name:"Cloud",game:"FF7",job:"SOLDIER",level:35,base:{hp:2200,mp:420,str:26,mag:18,def:20,spd:18,lck:15},equip:{weapon:null,armor:null,accessory:null},materia:["fire","ice","cure","haste"],espers:[]},
+ tifa:{name:"Tifa",game:"FF7",job:"Monk",level:34,base:{hp:2100,mp:280,str:30,mag:12,def:18,spd:22,lck:18},equip:{weapon:null,armor:null,accessory:null},materia:["fire","cure"],espers:[]},
+ aerith:{name:"Aerith",game:"FF7",job:"WhiteMage",level:33,base:{hp:1900,mp:620,str:12,mag:30,def:16,spd:17,lck:20},equip:{weapon:null,armor:null,accessory:null},materia:["cure","haste"],espers:[]},
+ terra:{name:"Terra",game:"FF6",job:"BlackMage",level:36,base:{hp:2000,mp:720,str:14,mag:34,def:18,spd:19,lck:17},equip:{weapon:null,armor:null,accessory:null},espers:["ifrit","ramuh","shiva"]},
+ locke:{name:"Locke",game:"FF6",job:"Thief",level:34,base:{hp:2100,mp:240,str:22,mag:14,def:18,spd:26,lck:28},equip:{weapon:null,armor:null,accessory:null}},
+ bartz:{name:"Bartz",game:"FF5",job:"Freelancer",level:30,base:{hp:2300,mp:360,str:24,mag:20,def:20,spd:22,lck:16},equip:{weapon:null,armor:null,accessory:null}},
+ faris:{name:"Faris",game:"FF5",job:"Thief",level:29,base:{hp:2200,mp:300,str:23,mag:18,def:19,spd:25,lck:19},equip:{weapon:null,armor:null,accessory:null}},
+ ramza:{name:"Ramza",game:"FFT",job:"Squire",level:28,base:{hp:2000,mp:260,str:24,mag:20,def:22,spd:18,lck:14},equip:{weapon:null,armor:null,accessory:null}},
+ agrias:{name:"Agrias",game:"FFT",job:"HolyKnight",level:30,base:{hp:2200,mp:320,str:26,mag:22,def:24,spd:17,lck:15},equip:{weapon:null,armor:null,accessory:null}},
+ crono:{name:"Crono",game:"Chrono Trigger",job:"Swordsman",level:40,base:{hp:2600,mp:220,str:30,mag:18,def:24,spd:30,lck:22},equip:{weapon:null,armor:null,accessory:null},techs:["Cyclone","Lightning","Spincut","Luminaire"]}
+},
+
+jobs:{
+ Freelancer:{bonus:{}},
+ Fighter:{bonus:{str:4,def:3}},
+ Knight:{bonus:{str:6,def:5}},
+ HolyKnight:{bonus:{str:7,mag:3,def:6}},
+ Thief:{bonus:{spd:6,lck:6}},
+ Monk:{bonus:{str:8,hp:300}},
+ Dragoon:{bonus:{str:6,spd:4}},
+ Samurai:{bonus:{str:7,lck:4}},
+ BlackMage:{bonus:{mag:8,mp:200}},
+ WhiteMage:{bonus:{mp:180}},
+ TimeMage:{bonus:{spd:4,mp:120}},
+ Summoner:{bonus:{mag:7}},
+ SOLDIER:{bonus:{str:4,mag:3}},
+ Squire:{bonus:{str:2,def:2}},
+ Swordsman:{bonus:{str:6,spd:4}}
+},
+
+equipment:{
+ buster:{name:"Buster Sword",slot:"weapon",tier:3,stats:{str:8}},
+ excalibur:{name:"Excalibur",slot:"weapon",tier:5,stats:{str:14,spd:4}},
+ masamune:{name:"Masamune",slot:"weapon",tier:5,stats:{str:12,spd:6}},
+ ragnarok:{name:"Ragnarok",slot:"weapon",tier:5,stats:{str:13,mag:3}},
+ kaiserKnuckles:{name:"Kaiser Knuckles",slot:"weapon",tier:4,stats:{str:10,spd:2}},
+ assassinDagger:{name:"Assassin Dagger",slot:"weapon",tier:4,stats:{str:7,spd:5,lck:4}},
+ bronzeArmor:{name:"Bronze Armor",slot:"armor",tier:1,stats:{hp:300,def:4}},
+ mythrilArmor:{name:"Mythril Armor",slot:"armor",tier:3,stats:{hp:600,def:7}},
+ genjiArmor:{name:"Genji Armor",slot:"armor",tier:5,stats:{hp:900,def:10}},
+ crystalArmor:{name:"Crystal Armor",slot:"armor",tier:5,stats:{hp:850,def:9,mag:3}},
+ powerRing:{name:"Power Ring",slot:"accessory",tier:2,stats:{str:4}},
+ magicRing:{name:"Magic Ring",slot:"accessory",tier:2,stats:{mag:5}},
+ hermesBoots:{name:"Hermes Boots",slot:"accessory",tier:3,stats:{spd:6}},
+ ribbon:{name:"Ribbon",slot:"accessory",tier:5,stats:{def:3,mag:3,lck:3}}
+},
+
+materia:{
+ fire:{name:"Fire",tier:1,stats:{mag:2},spells:["Fire"]},
+ fira:{name:"Fira",tier:2,stats:{mag:3},spells:["Fire","Fira"]},
+ firaga:{name:"Firaga",tier:3,stats:{mag:4},spells:["Fire","Fira","Firaga"]},
+ ice:{name:"Ice",tier:1,stats:{mag:2},spells:["Ice"]},
+ blizzara:{name:"Blizzara",tier:2,stats:{mag:3},spells:["Ice","Blizzara"]},
+ lightning:{name:"Lightning",tier:1,stats:{mag:2},spells:["Thunder"]},
+ thundara:{name:"Thundara",tier:2,stats:{mag:3},spells:["Thunder","Thundara"]},
+ cure:{name:"Cure",tier:1,stats:{},spells:["Cure"]},
+ cura:{name:"Cura",tier:2,stats:{},spells:["Cure","Cura"]},
+ haste:{name:"Haste",tier:2,stats:{spd:2},spells:["Haste"]}
+},
+
+espers:{
+ ifrit:{name:"Ifrit",stats:{str:4},learn:["fire","fira","firaga"],summon:"Fire"},
+ shiva:{name:"Shiva",stats:{mag:4},learn:["ice","blizzara"],summon:"Ice"},
+ ramuh:{name:"Ramuh",stats:{mag:5},learn:["lightning","thundara"],summon:"Lightning"},
+ bahamut:{name:"Bahamut",stats:{str:6,mag:6},learn:[],summon:"Non-Elemental"}
+},
+
+techs:{
+ Cyclone:{power:8,element:"wind"},
+ Lightning:{power:10,element:"lightning"},
+ Spincut:{power:14,element:"physical"},
+ Luminaire:{power:30,element:"light"}
+}
+};
+
+/**********************
+ UI LOGIC
+**********************/alert('Loaded');}}
+function applyEdit(){try{DB=JSON.parse(editor.value);init();}catch(e){alert('Invalid JSON')}}
+
+init();
+</script></body>
+</html>
