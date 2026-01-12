@@ -1,130 +1,42 @@
-JRPG MASTER ENGINE (FF + CHRONO)
-
-> Status: Full engine + UI + save/load + equip + jobs + materia + party Design goal: Expandable to thousands of entries without rewrites
-
-
-
-
----
-
-MASSIVE DATABASE (SCALABLE)
-
-NOTE (important, not hand‑waving)
-
-Instead of copy‑pasting 200 hardcoded rows (which will break browsers and your sanity), this engine uses:
-
-Seeded canonical characters (FF6 + FFBE + CT)
-
-Procedural expansion helpers so you can instantly scale to 200, 2,000, or 20,000 entries while keeping everything editable
-
-
-This is how real RPG tools work.
-
-
----
-
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>JRPG Master Menu</title>
+<meta charset="UTF-8">
+<title>JRPG Master Archive - Encyclopedia Ultimate</title>
 <style>
 :root{
- --bg1:#0b1020;--bg2:#111a33;--panel:#161f3d;--accent:#6cf;--text:#e6ecff
+ --bg1:#0b1020;--bg2:#111a33;--panel:#161f3d;--accent:#6cf;--text:#e6ecff;
 }
 *{box-sizing:border-box;font-family:system-ui}
 body{
- margin:0;min-height:100vh;color:var(--text);
+ margin:0; min-height:100vh; color:var(--text);
  background:linear-gradient(120deg,var(--bg1),var(--bg2));
- animation:bgfade 12s ease-in-out infinite alternate
+ animation:bgfade 20s ease-in-out infinite alternate;
 }
-@keyframes bgfade{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(20deg)}}
-#app{display:grid;grid-template-columns:220px 1fr 260px;gap:10px;padding:10px}
-.panel{background:var(--panel);border-radius:10px;padding:10px;box-shadow:0 10px 30px #0008}
-button{width:100%;margin:3px 0;padding:6px;border:0;border-radius:6px;background:#223366;color:#fff}
-button:hover{background:#3355aa}
-select{width:100%;background:#223366;color:#fff;border-radius:6px}
+@keyframes bgfade{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(30deg)}}
+#app{display:grid;grid-template-columns:280px 1fr 320px;gap:10px;padding:10px}
+.panel{background:var(--panel);border-radius:10px;padding:12px;box-shadow:0 15px 50px #000c;overflow:auto; max-height:95vh;}
+button{width:100%;margin:4px 0;padding:8px;border:0;border-radius:6px;background:#223366;color:#fff;cursor:pointer;}
+button:hover{background:#4466cc}
 pre{white-space:pre-wrap}
+select{width:100%;background:#223366;color:#fff;border-radius:6px}
 </style>
 </head>
 <body>
 <div id="app">
  <div class="panel"><h3>Characters</h3><div id="characters"></div></div>
  <div class="panel"><h3>Details</h3><div id="details"></div></div>
- <div class="panel"><h3>Equipment</h3><div id="equip"></div></div>
+ <div class="panel"><h3>Equipment / Materia</h3><div id="equip"></div></div>
 </div>
-
 <script>
-/**********************
- DATABASE CORE
-**********************/
-const DB={characters:{},jobs:{},equipment:{},materia:{},espers:{},techs:{}};
+const DB={characters:{},jobs:{},equipment:{},materia:{},espers:{},techs:{}};//==================== // Jobs Expanded //==================== DB.jobs={ Freelancer:{bonus:{str:4,def:3,spd:2}}, Knight:{bonus:{str:6,def:6,spd:2}}, Paladin:{bonus:{str:7,def:7,spd:3,mag:3}}, DarkKnight:{bonus:{str:9,def:5,mag:4}}, Monk:{bonus:{str:8,spd:6}}, Thief:{bonus:{spd:8,lck:7}}, Dragoon:{bonus:{str:7,spd:5}}, Samurai:{bonus:{str:7,mag:3,spd:3}}, Ninja:{bonus:{spd:8,lck:5,mag:2}}, BlackMage:{bonus:{mag:12,mp:300}}, WhiteMage:{bonus:{mag:9,mp:250}}, RedMage:{bonus:{str:4,mag:6,spd:4}}, TimeMage:{bonus:{mag:8,spd:3}}, Summoner:{bonus:{mag:10,mp:200}}, BlueMage:{bonus:{str:5,mag:7}}, Beastmaster:{bonus:{str:6,lck:6}}, HolyKnight:{bonus:{str:8,def:6,mag:4}}, Squire:{bonus:{str:3,def:3}}, SOLDIER:{bonus:{str:6,mag:5}}, Swordsman:{bonus:{str:5,spd:4}}, MagicKnight:{bonus:{str:5,mag:8,def:5}} };
 
-/**********************
- JOBS (FULL SET)
-**********************/
-["Freelancer","Knight","Paladin","DarkKnight","Monk","Thief","Dragoon","Samurai","Ninja","BlackMage","WhiteMage","RedMage","TimeMage","Summoner","BlueMage","Beastmaster","HolyKnight","Squire","SOLDIER","Swordsman"].forEach(j=>DB.jobs[j]={bonus:{str:2,def:2}});
-DB.jobs.BlackMage.bonus={mag:8,mp:200};
-DB.jobs.Thief.bonus={spd:6,lck:6};
-DB.jobs.SOLDIER.bonus={str:4,mag:3};
+//==================== // Equipment Expanded (hand-written) //==================== DB.equipment={ "Excalibur":{name:"Excalibur",slot:"weapon",tier:5,stats:{str:25,mag:5,spd:3},notes:"Legendary sword of light, ultimate damage."}, "Masamune":{name:"Masamune",slot:"weapon",tier:5,stats:{str:22,mag:6,spd:4},notes:"Ancient katana, pure blade power."}, "Ragnarok":{name:"Ragnarok",slot:"weapon",tier:5,stats:{str:24,mag:7,spd:3},notes:"Dragon-slaying blade, unparalleled sharpness."}, "Aegis Armor":{name:"Aegis Armor",slot:"armor",tier:5,stats:{hp:600,def:20},notes:"Reflects magic damage, fortified defense."}, "Mythic Rod":{name:"Mythic Rod",slot:"weapon",tier:4,stats:{mag:18,mp:60},notes:"Channeler’s staff, increases spell potency."}, "Relic Ring":{name:"Relic Ring",slot:"accessory",tier:3,stats:{spd:6,lck:5},notes:"Ancient accessory boosting luck and speed."}, "Phoenix Feather":{name:"Phoenix Feather",slot:"accessory",tier:4,stats:{hp:150,mp:50,spd:2},notes:"Revives allies in battle, rare and sacred."} };
 
-/**********************
- EQUIPMENT GENERATOR
-**********************/
-const weaponNames=["Sword","Blade","Spear","Axe","Rod","Staff","Dagger","Gun"];
-for(let i=1;i<=120;i++){
- DB.equipment[`weapon${i}`]={
-  name:`Mythic ${weaponNames[i%weaponNames.length]} ${i}`,
-  slot:"weapon",tier:1+Math.floor(i/30),
-  stats:{str:2+(i%8),mag:i%5,spd:i%4}
- }
-}
-for(let i=1;i<=60;i++){
- DB.equipment[`armor${i}`]={name:`Aegis Armor ${i}`,slot:"armor",tier:1+Math.floor(i/20),stats:{hp:200+i*10,def:2+i%6}}
-}
-for(let i=1;i<=40;i++){
- DB.equipment[`acc${i}`]={name:`Relic ${i}`,slot:"accessory",tier:1+Math.floor(i/10),stats:{spd:i%5,lck:i%4,mag:i%3}}
-}
+//==================== // Materia / Espers / Tech Expanded //==================== DB.materia={ fire:{name:"Fire",tier:1,spells:["Fire"],notes:"Basic fire spell."}, fira:{name:"Fira",tier:2,spells:["Fire","Fira"],notes:"Intermediate fire magic."}, firaga:{name:"Firaga",tier:3,spells:["Fire","Fira","Firaga"],notes:"Ultimate fire spell."}, cure:{name:"Cure",tier:1,spells:["Cure"],notes:"Heals small HP."}, cura:{name:"Cura",tier:2,spells:["Cure","Cura"],notes:"Heals moderate HP."}, haste:{name:"Haste",tier:2,spells:["Haste"],notes:"Speeds up party actions."} }; DB.espers={ Ifrit:{name:"Ifrit",stats:{str:5,mag:6},learn:["Fire","Fira","Firaga"],summon:"Fire"}, Shiva:{name:"Shiva",stats:{mag:7},learn:["Ice","Blizzara"],summon:"Ice"}, Ramuh:{name:"Ramuh",stats:{mag:8},learn:["Lightning"],summon:"Lightning"}, Bahamut:{name:"Bahamut",stats:{str:10,mag:10},learn:[],summon:"Non-Elemental"} }; DB.techs={ Cyclone:{power:12,element:"wind"}, Lightning:{power:15,element:"lightning"}, Spincut:{power:18,element:"physical"}, Luminaire:{power:30,element:"light"}, DoubleCut:{power:25,element:"physical"} };
 
-/**********************
- FF6 + FFBE CHARACTERS
-**********************/
-const ff6=["Terra","Locke","Edgar","Sabin","Celes","Shadow","Cyan","Gau","Setzer","Relm","Strago","Mog","Umaro","Gogo"];
-const ffbe=["Rain","Lasswell","Fina","Akstar","Esther","Hyoh","DarkFina","Nichol","Sakura","Ayaka"];
+//==================== // Characters Expanded Encyclopedia-Style (Part 1) //==================== DB.characters={ terra0:{name:"Terra Branford",game:"FF6",job:"MagicKnight",level:35,base:{hp:2000,mp:400,str:20,mag:26,def:18,spd:18,lck:16},equip:{weapon:null,armor:null,accessory:null},materia:[],espers:["Ifrit"],notes:"Half-human, half-Esper; central to the resistance."}, locke1:{name:"Locke Cole",game:"FF6",job:"Thief",level:32,base:{hp:1750,mp:180,str:22,mag:12,def:16,spd:22,lck:19},equip:{weapon:null,armor:null,accessory:null},materia:[],espers:[],notes:"Treasure hunter, agile and resourceful."}, celes2:{name:"Celes Chere",game:"FF6",job:"MagicKnight",level:34,base:{hp:1850,mp:300,str:19,mag:24,def:17,spd:17,lck:16},equip:{weapon:null,armor:null,accessory:null},materia:[],espers:[],notes:"Former general, uses sword and magic."}, sabin3:{name:"Sabin Rene Figaro",game:"FF6",job:"Monk",level:33,base:{hp:1950,mp:120,str:26,mag:11,def:19,spd:20,lck:15},equip:{weapon:null,armor:null,accessory:null},materia:[],espers:[],notes:"Martial artist with explosive moves."}, edgar4:{name:"Edgar Roni Figaro",game:"FF6",job:"Engineer",level:32,base:{hp:1850,mp:150,str:20,mag:15,def:18,spd:16,lck:14},equip:{weapon:null,armor:null,accessory:null},materia:[],espers:[],notes:"Inventor king with tools and devices for combat."}, cyan5:{name:"Cyan Garamonde",game:"FF6",job:"Swordsman",level:34,base:{hp:2000,mp:80,str:25,mag:10,def:22,spd:14,lck:15},equip:{weapon:null,armor:null,accessory:null},materia:[],espers:[],notes:"Loyal samurai, excels in sword techniques and honor-driven combat."} };
 
-function addChar(name,game,job,idx){
- DB.characters[name.toLowerCase()+idx]={
-  name,game,job,level:20+idx,
-  base:{hp:1800+idx*40,mp:300+idx*10,str:20+idx%6,mag:18+idx%6,def:18+idx%5,spd:18+idx%5,lck:14+idx%4},
-  equip:{weapon:null,armor:null,accessory:null},materia:[],espers:[]
- }
-}
-ff6.forEach((n,i)=>addChar(n,"FF6","Freelancer",i));
-ffbe.forEach((n,i)=>addChar(n,"FFBE","SOLDIER",i+20));
+//==================== // UI and Functions //==================== let party=Object.keys(DB.characters).slice(0,3); function save(){localStorage.setItem("jrpg",JSON.stringify({DB,party}))} function load(){let d=JSON.parse(localStorage.getItem("jrpg"));if(d){Object.assign(DB,d.DB);party=d.party}} const charList=document.getElementById("characters"); const detail=document.getElementById("details"); const equipDiv=document.getElementById("equip"); function calc(c){let t={...c.base};let jb=DB.jobs[c.job]?.bonus||{};for(let k in jb)t[k]=(t[k]||0)+jb[k];for(let e of Object.values(c.equip))if(e)for(let k in DB.equipment[e].stats)t[k]=(t[k]||0)+DB.equipment[e].stats[k];return t} function render(){charList.innerHTML="";Object.entries(DB.characters).forEach(([id,c])=>{let b=document.createElement("button");b.textContent=c.name+ (${c.game}); b.onclick=()=>show(id); charList.appendChild(b)})} function show(id){const c=DB.characters[id];detail.innerHTML=<h2>${c.name}</h2><p>${c.game} – ${c.job}</p><pre>${JSON.stringify(calc(c),null,2)}</pre><p>${c.notes}</p>; equipDiv.innerHTML="";Object.entries(DB.equipment).forEach(([eid,e])=>{let b=document.createElement("button");b.textContent=Equip ${e.name};b.onclick=()=>{c.equip[e.slot]=eid;show(id);}; equipDiv.appendChild(b)}); Object.entries(DB.materia).forEach(([mid,m])=>{let b=document.createElement("button");b.textContent=Add Materia ${m.name};b.onclick=()=>{c.materia.push(mid);show(id);}; equipDiv.appendChild(b)}); } load(); render(); </script>
 
-/**********************
- PARTY + SAVE SYSTEM
-**********************/
-let party=Object.keys(DB.characters).slice(0,3);
-function save(){localStorage.setItem("jrpg",JSON.stringify({DB,party}))}
-function load(){let d=JSON.parse(localStorage.getItem("jrpg"));if(d){Object.assign(DB,d.DB);party=d.party}}
-
-/**********************
- UI
-**********************/
-const charList=document.getElementById("characters");
-const detail=document.getElementById("details");
-const equipDiv=document.getElementById("equip");
-
-function calc(c){let t={...c.base};let jb=DB.jobs[c.job]?.bonus||{};for(let k in jb)t[k]=(t[k]||0)+jb[k];for(let e of Object.values(c.equip))if(e)for(let k in DB.equipment[e].stats)t[k]=(t[k]||0)+DB.equipment[e].stats[k];return t}
-
-function render(){charList.innerHTML="";Object.entries(DB.characters).forEach(([id,c])=>{let b=document.createElement("button");b.textContent=c.name;b.onclick=()=>show(id);charList.appendChild(b)})}
-
-function show(id){const c=DB.characters[id];detail.innerHTML=`<h2>${c.name}</h2><p>${c.game} – ${c.job}</p><pre>${JSON.stringify(calc(c),null,2)}</pre>`;
-equipDiv.innerHTML="";Object.entries(DB.equipment).slice(0,20).forEach(([eid,e])=>{let b=document.createElement("button");b.textContent=`Equip ${e.name}`;b.onclick=()=>{c.equip[e.slot]=eid;show(id)};equipDiv.appendChild(b)})}
-
-load();render();
-</script>
 </body>
 </html>
-
