@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            font-family: 'Courier New', Courier, monospace;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        /* The Main Blue Window */
+        .menu-container {
+            width: 100%;
+            height: 100%;
+            max-width: 500px;
+            background: linear-gradient(180deg, #0000ad 0%, #00004a 100%);
+            border: 4px double #ffffff;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Sidebar & Content Layout */
+        .main-layout {
+            display: flex;
+            flex: 1;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        /* Left Side: Navigation */
+        .sidebar {
+            width: 30%;
+            border: 2px solid #fff;
+            background: rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            padding: 10px 5px;
+        }
+
+        .nav-item {
+            cursor: pointer;
+            padding: 8px;
+            font-size: 0.9rem;
+            text-shadow: 2px 2px #000;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.2);
+            box-shadow: inset 0 0 5px #fff;
+        }
+
+        /* Right Side: Editable Stats & Equipment */
+        .content-area {
+            flex: 1;
+            border: 2px solid #fff;
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .label { color: #aaa; font-size: 0.7rem; display: block; }
+
+        /* Editable Text Styles */
+        input, select {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: #00ff00; /* Classic "Healed" Green */
+            font-family: inherit;
+            font-size: 1rem;
+            padding: 5px;
+            width: 100%;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        input:focus { border-color: #fff; background: rgba(255,255,255,0.1); }
+
+        .stat-group { margin-bottom: 20px; }
+
+        /* Footer: Gil & Time */
+        .footer {
+            height: 60px;
+            border: 2px solid #fff;
+            background: rgba(0,0,0,0.4);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .yellow-text { color: #ffff00; }
+        
+        .save-btn {
+            background: #fff;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="menu-container">
+    <div class="main-layout">
+        <div class="sidebar">
+            <div class="nav-item">ITEM</div>
+            <div class="nav-item" style="color: #ffff00;">➤ STATUS</div>
+            <div class="nav-item">EQUIP</div>
+            <div class="nav-item">MATERIA</div>
+            <div class="nav-item">CONFIG</div>
+            <div class="nav-item">SAVE</div>
+        </div>
+
+        <div class="content-area">
+            <div class="stat-group">
+                <span class="label">CHARACTER NAME</span>
+                <input type="text" value="CLOUD_STRIVE">
+            </div>
+
+            <div class="row">
+                <div style="width: 45%;">
+                    <span class="label">LEVEL</span>
+                    <input type="number" value="99" style="color: #ffff00;">
+                </div>
+                <div style="width: 45%;">
+                    <span class="label">EXP</span>
+                    <input type="number" value="999999">
+                </div>
+            </div>
+
+            <div class="stat-group">
+                <span class="label">CURRENT WEAPON (DROPDOWN)</span>
+                <select>
+                    <option>BUSTER SWORD</option>
+                    <option>MURASAME</option>
+                    <option>HEAVEN'S CLOUD</option>
+                    <option>ULTIMA WEAPON</option>
+                </select>
+            </div>
+
+            <div class="stat-group">
+                <span class="label">BASE ATTACK</span>
+                <input type="range" min="0" max="255" value="120" style="width: 100%;">
+                <div style="text-align: right; font-size: 1.2rem;">120</div>
+            </div>
+
+            <button class="save-btn" onclick="alert('Data Saved to Memory Card!')">CONFIRM CHANGES</button>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div>TIME <span class="yellow-text">99:59:59</span></div>
+        <div>GIL <span class="yellow-text">1,000,000</span></div>
+    </div>
+</div>
+
+</body>
+</html>
