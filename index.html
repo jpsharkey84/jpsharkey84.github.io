@@ -242,9 +242,10 @@ function renderToday(dateStr){
   // --- STATS PANEL ---
   const statsPanel=document.createElement('div'); statsPanel.className='day-panel';
   const statsTitle=document.createElement('div'); statsTitle.className='day-panel-title'; statsTitle.textContent='Stats';
+  const statsGil=document.createElement('div'); statsGIL.className='day-panel';
   statsPanel.appendChild(statsTitle);
   const statsBox=document.createElement('textarea');
-  statsBox.value = `Hours:${STATE.stats.hours}, Steps:${STATE.stats.steps}, Money:${STATE.stats.money}`;
+  statsBox.value = `Hours:${STATE.stats.hours}, Steps:${STATE.stats.steps}, gil:${STATE.stats.gil}`;
   statsBox.onchange = () => {
     const parts = statsBox.value.split(',');
     STATE.stats.hours = parseInt(parts[0].split(':')[1])||0;
