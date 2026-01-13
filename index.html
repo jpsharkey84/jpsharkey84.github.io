@@ -245,7 +245,7 @@ function renderToday(dateStr){
   const statsGil=document.createElement('div'); statsGIL.className='day-panel';
   statsPanel.appendChild(statsTitle);
   const statsBox=document.createElement('textarea');
-  statsBox.value = `Hours:${STATE.stats.hours}, Steps:${STATE.stats.steps}, gil:${STATE.stats.gil}`;
+  statsBox.value = `Hours:${STATE.stats.hours}, Steps:${STATE.stats.steps}, money:${STATE.stats.money}`;
   statsBox.onchange = () => {
     const parts = statsBox.value.split(',');
     STATE.stats.hours = parseInt(parts[0].split(':')[1])||0;
