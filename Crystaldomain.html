@@ -1,0 +1,209 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Beacons – Living App</title>
+  <style>
+    :root {
+      --ui-bg: rgba(30, 40, 60, 0.85);
+      --ui-border: rgba(180, 200, 255, 0.35);
+      --ui-text: #dfe8ff;
+      --accent: #ffb347; /* Orange Flow */
+      --muted: #9fb0d0;
+    }* { box-sizing: border-box; font-family: "Trebuchet MS", system-ui, sans-serif; }
+
+body {
+  margin: 0;
+  height: 100vh;
+  overflow: hidden;
+  color: var(--ui-text);
+  background: radial-gradient(circle at top, #ffd27d, #7aa2c8 45%, #1b263b 80%);
+}
+
+/* === SKY + CLOUDS === */
+.sky {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.clouds {
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  background: repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.15) 0 40px, rgba(255,255,255,0.05) 40px 80px);
+  animation: drift 120s linear infinite;
+  filter: blur(1px);
+}
+
+@keyframes drift {
+  from { transform: translateX(0) translateY(0); }
+  to { transform: translateX(-25%) translateY(-10%); }
+}
+
+/* === GOLDEN PATH === */
+.path {
+  position: absolute;
+  left: 50%;
+  bottom: -10%;
+  transform: translateX(-50%);
+  width: 140px;
+  height: 120%;
+  background: linear-gradient(to top, rgba(255,215,130,0.9), rgba(255,215,130,0.1));
+  box-shadow: 0 0 40px rgba(255,200,120,0.6);
+  animation: pulse 6s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,100% { opacity: 0.75; }
+  50% { opacity: 1; }
+}
+
+/* === UI PANELS === */
+.ui {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.panel {
+  background: var(--ui-bg);
+  border: 1px solid var(--ui-border);
+  border-radius: 14px;
+  padding: 14px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
+
+.panel h3 {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  letter-spacing: 1px;
+  color: var(--accent);
+}
+
+.menu button,
+.controls button {
+  width: 100%;
+  margin: 6px 0;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--ui-border);
+  background: rgba(255,255,255,0.05);
+  color: var(--ui-text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.menu button:hover,
+.controls button:hover {
+  background: rgba(255,180,80,0.25);
+  transform: translateY(-1px);
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.row button {
+  flex: 1;
+}
+
+.status {
+  font-size: 13px;
+  margin-bottom: 10px;
+  color: var(--muted);
+}
+
+.duck {
+  position: absolute;
+  right: 20px;
+  bottom: 16px;
+  font-size: 28px;
+  animation: bob 2s ease-in-out infinite;
+}
+
+@keyframes bob {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+  </style>
+</head>
+<body>  <div class="sky">
+    <div class="clouds"></div>
+  </div>  <div class="path"></div>  <div class="ui">
+    <!-- LEFT PANEL -->
+    <div class="panel">
+      <h3>BEACONS</h3>
+      <div class="menu">
+        <button onclick="log('Today opened')">TODAY</button>
+        <button onclick="log('Logs opened')">LOGS</button>
+        <button onclick="log('Backpack opened')">BACKPACK</button>
+        <button onclick="log('Flow view')">FLOW</button>
+        <button onclick="log('Money view')">MONEY</button>
+      </div>
+    </div><!-- RIGHT PANEL -->
+<div class="panel">
+  <h3 id="date"></h3>
+  <div class="status" id="mood">Mood: Orange Flow</div>
+
+  <div class="controls">
+    <div class="row">
+      <button onclick="setState('Active')">Active</button>
+      <button onclick="setState('Idle')">Idle</button>
+      <button onclick="setState('Paused')">Paused</button>
+    </div>
+    <div class="row">
+      <button onclick="setMood('Rain')">Rain</button>
+      <button onclick="setMood('Sun')">Sun</button>
+      <button onclick="setMood('Grey')">Grey</button>
+    </div>
+    <div class="row">
+      <button onclick="setFlow('Steady')">Steady</button>
+      <button onclick="setFlow('Flowing')">Flowing</button>
+      <button onclick="setFlow('Low')">Low</button>
+    </div>
+    <button onclick="saveDay()">Save Day</button>
+  </div>
+</div>
+
+  </div>  <div class="duck">🦆</div>  <script>
+    const dateEl = document.getElementById('date');
+    const moodEl = document.getElementById('mood');
+
+    const today = new Date();
+    dateEl.textContent = today.toDateString();
+
+    function log(msg) {
+      console.log('[BEACONS]', msg);
+    }
+
+    function setState(state) {
+      log('State: ' + state);
+    }
+
+    function setMood(mood) {
+      moodEl.textContent = 'Mood: ' + mood;
+      document.documentElement.style.setProperty('--accent',
+        mood === 'Sun' ? '#ffcc66' : mood === 'Rain' ? '#7fb3ff' : '#9aa0a6'
+      );
+    }
+
+    function setFlow(flow) {
+      log('Flow: ' + flow);
+    }
+
+    function saveDay() {
+      const stamp = new Date().toISOString();
+      localStorage.setItem('beacons:lastSave', stamp);
+      alert('Day saved ✨');
+    }
+  </script></body>
+</html>
