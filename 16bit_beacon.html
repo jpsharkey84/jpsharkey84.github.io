@@ -2,179 +2,227 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
+        :root {
+            --window-blue: linear-gradient(180deg, #0a0a9c 0%, #000040 100%);
+            --border-silver: #e7e7e7;
+            --text-gold: #f7d308;
+            --text-shadow: 2px 2px 0px rgba(0,0,0,0.8);
+            --bevel-inner: inset 2px 2px 1px rgba(255,255,255,0.4), inset -2px -2px 1px rgba(0,0,0,0.6);
+        }
+
         body {
-            margin: 0;
-            padding: 0;
-            background-color: #000;
-            font-family: 'Courier New', Courier, monospace;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            background-color: #111;
+            margin: 0; padding: 0;
+            font-family: 'Verdana', sans-serif;
             color: white;
-            text-transform: uppercase;
+            display: flex; justify-content: center;
         }
 
-        /* The Main Blue Window */
-        .menu-container {
-            width: 100%;
-            height: 100%;
+        /* FULL PAGE WRAPPER */
+        .ui-viewport {
+            width: 100vw; height: 100vh;
             max-width: 500px;
-            background: linear-gradient(180deg, #0000ad 0%, #00004a 100%);
-            border: 4px double #ffffff;
+            background: var(--window-blue);
+            border: 4px double var(--border-silver);
             box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            padding: 10px;
-            position: relative;
+            display: flex; flex-direction: column;
             overflow: hidden;
+            box-shadow: 0 0 20px #000;
         }
 
-        /* Sidebar & Content Layout */
-        .main-layout {
+        /* 1. TOP BAR: PARTY SWITCHER */
+        .party-bar {
+            height: 60px;
             display: flex;
+            background: rgba(0,0,0,0.4);
+            border-bottom: 2px solid var(--border-silver);
+        }
+        .party-member {
             flex: 1;
-            gap: 10px;
-            margin-bottom: 10px;
+            display: flex; align-items: center; justify-content: center;
+            border-right: 1px solid rgba(255,255,255,0.1);
+            filter: grayscale(1); opacity: 0.5;
+        }
+        .party-member.active {
+            filter: grayscale(0); opacity: 1;
+            background: rgba(255,255,255,0.15);
+            box-shadow: var(--bevel-inner);
         }
 
-        /* Left Side: Navigation */
-        .sidebar {
-            width: 30%;
-            border: 2px solid #fff;
-            background: rgba(0,0,0,0.3);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            padding: 10px 5px;
-        }
-
-        .nav-item {
-            cursor: pointer;
-            padding: 8px;
-            font-size: 0.9rem;
-            text-shadow: 2px 2px #000;
-        }
-
-        .nav-item:hover {
-            background: rgba(255,255,255,0.2);
-            box-shadow: inset 0 0 5px #fff;
-        }
-
-        /* Right Side: Editable Stats & Equipment */
-        .content-area {
-            flex: 1;
-            border: 2px solid #fff;
-            background: rgba(0,0,0,0.3);
+        /* 2. CHARACTER HEADER (EDITABLE NAME & LV) */
+        .char-info {
             padding: 15px;
+            display: flex; justify-content: space-between;
+            align-items: center;
+        }
+        .edit-name {
+            background: transparent; border: none;
+            color: white; font-size: 1.8rem; font-weight: bold;
+            text-shadow: var(--text-shadow); width: 70%;
+        }
+        .edit-lv {
+            color: var(--text-gold); font-size: 1.2rem;
+            display: flex; align-items: center;
+        }
+        .edit-lv input {
+            background: transparent; border: 1px solid var(--text-gold);
+            color: var(--text-gold); width: 40px; text-align: center;
+        }
+
+        /* 3. CORE STATS BOARD (GRID) */
+        .stats-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px; padding: 10px;
+        }
+        .stat-card {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 8px; border-radius: 4px;
+            box-shadow: var(--bevel-inner);
+        }
+        .stat-label { color: var(--text-gold); font-size: 0.65rem; display: block; }
+        .stat-input {
+            background: transparent; border: none;
+            color: #00ff00; font-size: 1.3rem; width: 100%;
+            font-family: monospace; text-shadow: 1px 1px 2px #000;
+        }
+
+        /* 4. EQUIPMENT DROPS (MODERN JRPG STYLE) */
+        .equip-section {
+            padding: 10px;
+            flex-grow: 1;
             overflow-y: auto;
         }
-
-        .row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
+        .equip-slot {
+            margin-bottom: 12px;
+            position: relative;
         }
-
-        .label { color: #aaa; font-size: 0.7rem; display: block; }
-
-        /* Editable Text Styles */
-        input, select {
-            background: transparent;
-            border: 1px solid rgba(255,255,255,0.3);
-            color: #00ff00; /* Classic "Healed" Green */
-            font-family: inherit;
-            font-size: 1rem;
-            padding: 5px;
+        .equip-select {
             width: 100%;
-            outline: none;
-            box-sizing: border-box;
+            background: #000;
+            color: #fff;
+            border: 2px solid var(--border-silver);
+            padding: 12px;
+            font-size: 1rem;
+            border-radius: 0;
+            appearance: none;
+            box-shadow: var(--bevel-inner);
+        }
+        /* Custom arrow for the drop */
+        .equip-slot::after {
+            content: "▼";
+            position: absolute; right: 15px; top: 32px;
+            color: var(--border-silver); pointer-events: none;
         }
 
-        input:focus { border-color: #fff; background: rgba(255,255,255,0.1); }
-
-        .stat-group { margin-bottom: 20px; }
-
-        /* Footer: Gil & Time */
-        .footer {
-            height: 60px;
-            border: 2px solid #fff;
-            background: rgba(0,0,0,0.4);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
+        /* 5. ITEM DROP LIST (SCROLLABLE) */
+        .inventory-tray {
+            height: 150px;
+            background: rgba(0,0,0,0.6);
+            border-top: 2px solid var(--border-silver);
+            overflow-y: scroll;
         }
-
-        .yellow-text { color: #ffff00; }
-        
-        .save-btn {
-            background: #fff;
-            color: #000;
-            border: none;
+        .inventory-item {
+            display: flex; justify-content: space-between;
             padding: 10px 20px;
-            font-weight: bold;
-            font-family: inherit;
-            cursor: pointer;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
+
+        /* 6. FOOTER ACTIONS */
+        .menu-footer {
+            padding: 15px;
+            background: rgba(0,0,0,0.8);
+            display: flex; gap: 10px;
+        }
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--border-silver);
+            background: transparent;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: var(--bevel-inner);
+        }
+        .btn-save { background: rgba(255,255,255,0.1); border-color: var(--text-gold); color: var(--text-gold); }
     </style>
 </head>
 <body>
 
-<div class="menu-container">
-    <div class="main-layout">
-        <div class="sidebar">
-            <div class="nav-item">ITEM</div>
-            <div class="nav-item" style="color: #ffff00;">➤ STATUS</div>
-            <div class="nav-item">EQUIP</div>
-            <div class="nav-item">MATERIA</div>
-            <div class="nav-item">CONFIG</div>
-            <div class="nav-item">SAVE</div>
-        </div>
+<div class="ui-viewport">
+    <div class="party-bar">
+        <div class="party-member active">CLOUD</div>
+        <div class="party-member">TIFA</div>
+        <div class="party-member">BARRET</div>
+    </div>
 
-        <div class="content-area">
-            <div class="stat-group">
-                <span class="label">CHARACTER NAME</span>
-                <input type="text" value="CLOUD_STRIVE">
-            </div>
-
-            <div class="row">
-                <div style="width: 45%;">
-                    <span class="label">LEVEL</span>
-                    <input type="number" value="99" style="color: #ffff00;">
-                </div>
-                <div style="width: 45%;">
-                    <span class="label">EXP</span>
-                    <input type="number" value="999999">
-                </div>
-            </div>
-
-            <div class="stat-group">
-                <span class="label">CURRENT WEAPON (DROPDOWN)</span>
-                <select>
-                    <option>BUSTER SWORD</option>
-                    <option>MURASAME</option>
-                    <option>HEAVEN'S CLOUD</option>
-                    <option>ULTIMA WEAPON</option>
-                </select>
-            </div>
-
-            <div class="stat-group">
-                <span class="label">BASE ATTACK</span>
-                <input type="range" min="0" max="255" value="120" style="width: 100%;">
-                <div style="text-align: right; font-size: 1.2rem;">120</div>
-            </div>
-
-            <button class="save-btn" onclick="alert('Data Saved to Memory Card!')">CONFIRM CHANGES</button>
+    <div class="char-info">
+        <input type="text" class="edit-name" value="STRIVE">
+        <div class="edit-lv">
+            LV <input type="number" value="99">
         </div>
     </div>
 
-    <div class="footer">
-        <div>TIME <span class="yellow-text">99:59:59</span></div>
-        <div>GIL <span class="yellow-text">1,000,000</span></div>
+    <div class="stats-container">
+        <div class="stat-card">
+            <span class="stat-label">HP (CURRENT)</span>
+            <input type="number" class="stat-input" value="9999">
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">MP (CURRENT)</span>
+            <input type="number" class="stat-input" value="999">
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">STRENGTH</span>
+            <input type="number" class="stat-input" value="255">
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">DEXTERITY</span>
+            <input type="number" class="stat-input" value="128">
+        </div>
+    </div>
+
+    <div class="equip-section">
+        <div class="equip-slot">
+            <span class="stat-label">MAIN HAND</span>
+            <select class="equip-select">
+                <option>BUSTER SWORD</option>
+                <option>RUNE BLADE</option>
+                <option>ORGANICS</option>
+                <option>ULTIMA WEAPON</option>
+            </select>
+        </div>
+        <div class="equip-slot">
+            <span class="stat-label">ARMOR PIECE</span>
+            <select class="equip-select">
+                <option>TITAN ARMLET</option>
+                <option>DRAGON BANGLE</option>
+                <option>ZIEDRICH</option>
+            </select>
+        </div>
+        <div class="equip-slot">
+            <span class="stat-label">ACCESSORY</span>
+            <select class="equip-select">
+                <option>RIBBON</option>
+                <option>CHAMPION BELT</option>
+                <option>TOUGHNESS RING</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="inventory-tray">
+        <div class="inventory-item"><span>ELIXIR</span> <span style="color:var(--text-gold)">x 99</span></div>
+        <div class="inventory-item"><span>MEGALIXIR</span> <span style="color:var(--text-gold)">x 05</span></div>
+        <div class="inventory-item"><span>X-POTION</span> <span style="color:var(--text-gold)">x 50</span></div>
+        <div class="inventory-item"><span>ETHER</span> <span style="color:var(--text-gold)">x 12</span></div>
+    </div>
+
+    <div class="menu-footer">
+        <button class="btn">DISCARD</button>
+        <button class="btn btn-save">UPDATE STATUS</button>
     </div>
 </div>
 
