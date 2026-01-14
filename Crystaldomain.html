@@ -1,127 +1,247 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>SNES OS 2026 - Massive Edition</title>
-    <link href="fonts.googleapis.com" rel="stylesheet">
-    <style>
-        /* 16-BIT GLOBAL UTILITIES */
-        :root {
-            --ff6-grad: linear-gradient(180deg, #02007d 0%, #000045 45%, #000020 100%);
-            --ct-marble: #3e3228;
-            --pixel-border: 4px solid #fff;
-        }
+<meta charset="UTF-8">
+<title>Living Menu</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        body { 
-            background: #000; 
-            color: #eee; 
-            font-family: 'Press Start 2P', cursive; 
-            image-rendering: pixelated; 
-            padding: 40px;
-        }
+<style>
+:root {
+  --bg: #0b0e14;
+  --panel: #141926;
+  --text: #e6e6eb;
+  --muted: #9aa0b5;
+  --accent: #4fd1c5;
+  --cursor: #ffffff;
+}
 
-        /* FFVI ENGINE: BLUE BOX ARCHITECTURE */
-        .ff6-frame {
-            background: var(--ff6-grad);
-            border: 4px double #c0c0c0;
-            border-radius: 6px;
-            box-shadow: inset 0 0 15px #000, 4px 4px 0 #111;
-            padding: 20px;
-            margin-bottom: 30px;
-        }
+* {
+  box-sizing: border-box;
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
 
-        /* CHRONO TRIGGER ENGINE: MARBLE UI */
-        .ct-frame {
-            background: var(--ct-marble);
-            border: 6px ridge #d4af37;
-            padding: 20px;
-            position: relative;
-        }
-        
-        .ct-window-inner {
-            background: rgba(0,0,0,0.8);
-            border: 2px solid #5d4a3a;
-            padding: 15px;
-        }
+body {
+  margin: 0;
+  height: 100vh;
+  background: radial-gradient(circle at top, #151a2e, var(--bg));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+}
 
-        /* DYNAMIC SCALING PIXELS */
-        .pixel-text { font-size: 14px; line-height: 1.8; text-shadow: 2px 2px #000; }
-        .editable { border-bottom: 1px dashed transparent; transition: 0.2s; }
-        .editable:hover { border-bottom-color: #aaa; background: rgba(255,255,255,0.05); }
+.menu-container {
+  background: var(--panel);
+  width: 320px;
+  padding: 20px 24px;
+  border-radius: 14px;
+  box-shadow: 0 30px 80px rgba(0,0,0,.6);
+}
 
-        /* SCANLINE FILTER */
-        .scanlines {
-            pointer-events: none;
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            background-size: 100% 4px, 3px 100%; z-index: 100;
-        }
-    </style>
+.menu-title {
+  font-size: 18px;
+  margin-bottom: 14px;
+  color: var(--accent);
+  letter-spacing: 1px;
+}
+
+.menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu li {
+  display: flex;
+  align-items: center;
+  padding: 8px 6px;
+  margin: 4px 0;
+  border-radius: 6px;
+  transition: background .15s ease;
+}
+
+.menu li.active {
+  background: rgba(79,209,197,.12);
+}
+
+.cursor {
+  width: 12px;
+  margin-right: 10px;
+  color: var(--cursor);
+  opacity: 0;
+  transition: opacity .15s ease;
+}
+
+.menu li.active .cursor {
+  opacity: 1;
+}
+
+.menu span {
+  font-size: 15px;
+}
+
+.footer {
+  margin-top: 16px;
+  font-size: 11px;
+  color: var(--muted);
+  text-align: right;
+}
+</style>
 </head>
+
 <body>
-    <div class="scanlines"></div>
 
-    <!-- FFVI PARTY MODULE -->
-    <div class="ff6-frame" id="ff6-party">
-        <div class="pixel-text">
-            <span style="color: #ffd700;">FINAL FANTASY VI STATE</span>
-            <hr style="border: 1px solid rgba(255,255,255,0.2)">
-            <div style="display:grid; grid-template-columns: 100px 1fr; gap:20px;">
-                <div class="editable" contenteditable="true" data-key="p1_name">LOCKE</div>
-                <div class="editable" contenteditable="true" data-key="p1_status">HP 4500/4500</div>
-            </div>
-        </div>
-    </div>
+<div class="menu-container">
+  <div class="menu-title">MAIN MENU</div>
 
-    <!-- CHRONO TRIGGER TECH MODULE -->
-    <div class="ct-frame" id="ct-techs">
-        <div class="ct-window-inner">
-            <div class="pixel-text" style="color: #d4af37;">CHRONO TRIGGER TECHS</div>
-            <div id="tech-list" style="margin-top:15px;">
-                <div class="editable" contenteditable="true" data-key="t1">Cyclone (8 MP)</div>
-                <div class="editable" contenteditable="true" data-key="t2">Luminaire (20 MP)</div>
-            </div>
-        </div>
-    </div>
+  <ul class="menu" id="menu">
+    <li><div class="cursor">▶</div><span>Records</span></li>
+    <li><div class="cursor">▶</div><span>Journal</span></li>
+    <li><div class="cursor">▶</div><span>Inventory</span></li>
+    <li><div class="cursor">▶</div><span>Settings</span></li>
+    <li><div class="cursor">▶</div><span>Save</span></li>
+    <!-- ADD MENU ITEM HERE -->
+  </ul>
 
-    <script>
-        // MASSIVE STATE ENGINE (SRAM SIM)
-        const SRAM = {
-            data: {},
-            
-            init() {
-                const saved = localStorage.getItem('snes_sram_2026');
-                if (saved) {
-                    this.data = JSON.parse(saved);
-                    this.applyToDOM();
-                }
-                this.bindEvents();
-            },
+  <div class="footer">↑ ↓ select · enter confirm</div>
+</div>
 
-            bindEvents() {
-                document.querySelectorAll('.editable').forEach(el => {
-                    el.addEventListener('input', () => {
-                        this.data[el.dataset.key] = el.innerText;
-                        this.save();
-                    });
-                });
-            },
+<script>
+const menu = document.getElementById("menu");
+const items = [...menu.children];
 
-            applyToDOM() {
-                Object.keys(this.data).forEach(key => {
-                    const el = document.querySelector(`[data-key="${key}"]`);
-                    if (el) el.innerText = this.data[key];
-                });
-            },
+let index = Number(localStorage.getItem("menuIndex")) || 0;
 
-            save() {
-                localStorage.setItem('snes_sram_2026', JSON.stringify(this.data));
-                console.log("SRAM: Battery Write Successful.");
-            }
-        };
+function render() {
+  items.forEach((item, i) => {
+    item.classList.toggle("active", i === index);
+  });
+  localStorage.setItem("menuIndex", index);
+}
 
-        SRAM.init();
-    </script>
+function move(dir) {
+  index += dir;
+  if (index < 0) index = items.length - 1;
+  if (index >= items.length) index = 0;
+  render();
+}
+
+function select() {
+  const choice = items[index].innerText.trim();
+  alert("Selected: " + choice);
+  // ADD LOGIC HERE
+}
+
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowUp") move(-1);
+  if (e.key === "ArrowDown") move(1);
+  if (e.key === "Enter") select();
+});
+
+// Touch support
+items.forEach((item, i) => {
+  item.addEventListener("click", () => {
+    index = i;
+    render();
+    select();
+  });
+});
+
+render();
+</script>
+<script>
+/* ===========================
+   ADDITIVE SYSTEM LAYER
+   =========================== */
+
+// Panel container (created dynamically)
+const panel = document.createElement("div");
+panel.style.position = "fixed";
+panel.style.inset = "0";
+panel.style.background = "rgba(11,14,20,.95)";
+panel.style.display = "none";
+panel.style.alignItems = "center";
+panel.style.justifyContent = "center";
+panel.style.zIndex = "10";
+document.body.appendChild(panel);
+
+// Panel content
+const panelBox = document.createElement("div");
+panelBox.style.background = "var(--panel)";
+panelBox.style.width = "340px";
+panelBox.style.minHeight = "200px";
+panelBox.style.borderRadius = "14px";
+panelBox.style.padding = "20px";
+panelBox.style.color = "var(--text)";
+panel.appendChild(panelBox);
+
+// Save system
+const saveKey = "livingMenuSaves";
+const saves = JSON.parse(localStorage.getItem(saveKey) || "{}");
+
+function openPanel(title, content) {
+  panelBox.innerHTML = `
+    <h3 style="margin-top:0;color:var(--accent)">${title}</h3>
+    <div>${content}</div>
+    <div style="margin-top:20px;font-size:12px;opacity:.7">ESC to return</div>
+  `;
+  panel.style.display = "flex";
+}
+
+function closePanel() {
+  panel.style.display = "none";
+}
+
+// Extend select() WITHOUT replacing it
+const originalSelect = select;
+select = function () {
+  const choice = items[index].innerText.trim();
+
+  if (choice === "Records") {
+    openPanel("Records", "<p>No records yet.</p>");
+  }
+  else if (choice === "Journal") {
+    openPanel(
+      "Journal",
+      `<textarea id="journal" style="width:100%;height:120px;background:#0b0e14;color:white;border:0;padding:8px"></textarea>
+       <button onclick="saveJournal()">Save</button>`
+    );
+    document.getElementById("journal").value = saves.journal || "";
+  }
+  else if (choice === "Settings") {
+    openPanel(
+      "Settings",
+      `<button onclick="setTheme('dark')">Dark</button>
+       <button onclick="setTheme('teal')">Teal</button>`
+    );
+  }
+  else {
+    originalSelect(); // fallback
+  }
+};
+
+// Journal save
+function saveJournal() {
+  saves.journal = document.getElementById("journal").value;
+  localStorage.setItem(saveKey, JSON.stringify(saves));
+}
+
+// Theme system (CSS variable swap)
+function setTheme(mode) {
+  if (mode === "teal") {
+    document.documentElement.style.setProperty("--accent", "#4fd1c5");
+  }
+  if (mode === "dark") {
+    document.documentElement.style.setProperty("--accent", "#ffffff");
+  }
+}
+
+// Back navigation
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && panel.style.display === "flex") {
+    closePanel();
+  }
+});
+</script>
 </body>
 </html>
