@@ -1,247 +1,143 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Living Menu</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.1);
+            --border: rgba(255, 255, 255, 0.4);
+            --glow: #4ae3ff;
+            --text: #e0fbff;
+        }
 
-<style>
-:root {
-  --bg: #0b0e14;
-  --panel: #141926;
-  --text: #e6e6eb;
-  --muted: #9aa0b5;
-  --accent: #4fd1c5;
-  --cursor: #ffffff;
-}
+        body {
+            margin: 0; padding: 0;
+            background: radial-gradient(circle at center, #001a33 0%, #000 100%);
+            font-family: 'Segoe UI', sans-serif;
+            color: var(--text);
+            display: flex; justify-content: center;
+            overflow: hidden; height: 100vh;
+        }
 
-* {
-  box-sizing: border-box;
-  font-family: "Segoe UI", system-ui, sans-serif;
-}
+        /* 1. THE GLASSWAY BACKGROUND ANIMATION */
+        .glassway {
+            position: absolute; width: 100%; height: 100%;
+            background: 
+                linear-gradient(90deg, transparent 49%, rgba(74, 227, 255, 0.1) 50%, transparent 51%),
+                linear-gradient(0deg, transparent 49%, rgba(74, 227, 255, 0.1) 50%, transparent 51%);
+            background-size: 80px 80px;
+            transform: perspective(500px) rotateX(60deg);
+            animation: move-tiles 10s linear infinite;
+            z-index: -1;
+        }
 
-body {
-  margin: 0;
-  height: 100vh;
-  background: radial-gradient(circle at top, #151a2e, var(--bg));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text);
-}
+        @keyframes move-tiles {
+            from { background-position: 0 0; }
+            to { background-position: 0 80px; }
+        }
 
-.menu-container {
-  background: var(--panel);
-  width: 320px;
-  padding: 20px 24px;
-  border-radius: 14px;
-  box-shadow: 0 30px 80px rgba(0,0,0,.6);
-}
+        /* 2. THE MAIN BOARD (BREATHING PANEL) */
+        .ui-board {
+            width: 90vw; max-width: 420px;
+            margin-top: 5vh; height: 85vh;
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(74, 227, 255, 0.2);
+            display: flex; flex-direction: column;
+            animation: breathe 4s ease-in-out infinite;
+        }
 
-.menu-title {
-  font-size: 18px;
-  margin-bottom: 14px;
-  color: var(--accent);
-  letter-spacing: 1px;
-}
+        @keyframes breathe {
+            0%, 100% { box-shadow: 0 0 20px rgba(74, 227, 255, 0.2); transform: scale(1); }
+            50% { box-shadow: 0 0 40px rgba(74, 227, 255, 0.4); transform: scale(1.01); }
+        }
 
-.menu {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
+        /* 3. INTERACTIVE TILES (DROPS & VALUES) */
+        .tile {
+            background: rgba(255, 255, 255, 0.05);
+            margin: 10px; padding: 15px;
+            border-radius: 12px;
+            border: 1px solid transparent;
+            transition: 0.3s;
+        }
 
-.menu li {
-  display: flex;
-  align-items: center;
-  padding: 8px 6px;
-  margin: 4px 0;
-  border-radius: 6px;
-  transition: background .15s ease;
-}
+        .tile:active { border-color: var(--glow); background: rgba(74, 227, 255, 0.1); }
 
-.menu li.active {
-  background: rgba(79,209,197,.12);
-}
+        .label { font-size: 0.7rem; letter-spacing: 2px; color: var(--glow); text-transform: uppercase; }
 
-.cursor {
-  width: 12px;
-  margin-right: 10px;
-  color: var(--cursor);
-  opacity: 0;
-  transition: opacity .15s ease;
-}
+        input, select {
+            width: 100%; background: transparent; border: none;
+            color: white; font-size: 1.2rem; padding: 5px 0;
+            outline: none; font-family: inherit;
+        }
 
-.menu li.active .cursor {
-  opacity: 1;
-}
+        /* 4. THE BEACON SPIRES (GLOW BUTTONS) */
+        .beacon-btn {
+            background: linear-gradient(45deg, #00d4ff, #004e92);
+            border: none; color: white; padding: 15px;
+            margin: 10px; border-radius: 12px;
+            font-weight: bold; letter-spacing: 2px;
+            text-shadow: 0 0 10px #fff;
+            animation: spire-glow 3s infinite alternate;
+        }
 
-.menu span {
-  font-size: 15px;
-}
+        @keyframes spire-glow {
+            from { filter: brightness(1) drop-shadow(0 0 5px var(--glow)); }
+            to { filter: brightness(1.5) drop-shadow(0 0 20px var(--glow)); }
+        }
 
-.footer {
-  margin-top: 16px;
-  font-size: 11px;
-  color: var(--muted);
-  text-align: right;
-}
-</style>
+        .scroll-area { flex: 1; overflow-y: auto; padding-bottom: 20px; }
+    </style>
 </head>
-
 <body>
 
-<div class="menu-container">
-  <div class="menu-title">MAIN MENU</div>
+    <div class="glassway"></div>
 
-  <ul class="menu" id="menu">
-    <li><div class="cursor">▶</div><span>Records</span></li>
-    <li><div class="cursor">▶</div><span>Journal</span></li>
-    <li><div class="cursor">▶</div><span>Inventory</span></li>
-    <li><div class="cursor">▶</div><span>Settings</span></li>
-    <li><div class="cursor">▶</div><span>Save</span></li>
-    <!-- ADD MENU ITEM HERE -->
-  </ul>
+    <div class="ui-board">
+        <div style="text-align:center; padding: 20px; font-weight: 200; font-size: 1.5rem;">STATUS COMMAND</div>
+        
+        <div class="scroll-area">
+            <div class="tile">
+                <span class="label">Identity Pin</span>
+                <input type="text" value="CLOUD_07">
+            </div>
 
-  <div class="footer">↑ ↓ select · enter confirm</div>
-</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr;">
+                <div class="tile">
+                    <span class="label">Level</span>
+                    <input type="number" value="99">
+                </div>
+                <div class="tile">
+                    <span class="label">Integrity</span>
+                    <input type="number" value="255">
+                </div>
+            </div>
 
-<script>
-const menu = document.getElementById("menu");
-const items = [...menu.children];
+            <div class="tile">
+                <span class="label">Active Blade Equiv.</span>
+                <select>
+                    <option>BUSTER_G1</option>
+                    <option>HARDEDGE_RE</option>
+                    <option>ULTIMA_CORE</option>
+                </select>
+            </div>
 
-let index = Number(localStorage.getItem("menuIndex")) || 0;
+            <div class="tile" style="opacity: 0.7;">
+                <span class="label">Inventory Drops</span>
+                <div style="display:flex; justify-content:space-between; margin-top:10px;">
+                    <span>Ether Core</span> <span>x 99</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-top:10px;">
+                    <span>Hi-Potion</span> <span>x 50</span>
+                </div>
+            </div>
+        </div>
 
-function render() {
-  items.forEach((item, i) => {
-    item.classList.toggle("active", i === index);
-  });
-  localStorage.setItem("menuIndex", index);
-}
+        <button class="beacon-btn">INITIATE UPDATE</button>
+    </div>
 
-function move(dir) {
-  index += dir;
-  if (index < 0) index = items.length - 1;
-  if (index >= items.length) index = 0;
-  render();
-}
-
-function select() {
-  const choice = items[index].innerText.trim();
-  alert("Selected: " + choice);
-  // ADD LOGIC HERE
-}
-
-document.addEventListener("keydown", e => {
-  if (e.key === "ArrowUp") move(-1);
-  if (e.key === "ArrowDown") move(1);
-  if (e.key === "Enter") select();
-});
-
-// Touch support
-items.forEach((item, i) => {
-  item.addEventListener("click", () => {
-    index = i;
-    render();
-    select();
-  });
-});
-
-render();
-</script>
-<script>
-/* ===========================
-   ADDITIVE SYSTEM LAYER
-   =========================== */
-
-// Panel container (created dynamically)
-const panel = document.createElement("div");
-panel.style.position = "fixed";
-panel.style.inset = "0";
-panel.style.background = "rgba(11,14,20,.95)";
-panel.style.display = "none";
-panel.style.alignItems = "center";
-panel.style.justifyContent = "center";
-panel.style.zIndex = "10";
-document.body.appendChild(panel);
-
-// Panel content
-const panelBox = document.createElement("div");
-panelBox.style.background = "var(--panel)";
-panelBox.style.width = "340px";
-panelBox.style.minHeight = "200px";
-panelBox.style.borderRadius = "14px";
-panelBox.style.padding = "20px";
-panelBox.style.color = "var(--text)";
-panel.appendChild(panelBox);
-
-// Save system
-const saveKey = "livingMenuSaves";
-const saves = JSON.parse(localStorage.getItem(saveKey) || "{}");
-
-function openPanel(title, content) {
-  panelBox.innerHTML = `
-    <h3 style="margin-top:0;color:var(--accent)">${title}</h3>
-    <div>${content}</div>
-    <div style="margin-top:20px;font-size:12px;opacity:.7">ESC to return</div>
-  `;
-  panel.style.display = "flex";
-}
-
-function closePanel() {
-  panel.style.display = "none";
-}
-
-// Extend select() WITHOUT replacing it
-const originalSelect = select;
-select = function () {
-  const choice = items[index].innerText.trim();
-
-  if (choice === "Records") {
-    openPanel("Records", "<p>No records yet.</p>");
-  }
-  else if (choice === "Journal") {
-    openPanel(
-      "Journal",
-      `<textarea id="journal" style="width:100%;height:120px;background:#0b0e14;color:white;border:0;padding:8px"></textarea>
-       <button onclick="saveJournal()">Save</button>`
-    );
-    document.getElementById("journal").value = saves.journal || "";
-  }
-  else if (choice === "Settings") {
-    openPanel(
-      "Settings",
-      `<button onclick="setTheme('dark')">Dark</button>
-       <button onclick="setTheme('teal')">Teal</button>`
-    );
-  }
-  else {
-    originalSelect(); // fallback
-  }
-};
-
-// Journal save
-function saveJournal() {
-  saves.journal = document.getElementById("journal").value;
-  localStorage.setItem(saveKey, JSON.stringify(saves));
-}
-
-// Theme system (CSS variable swap)
-function setTheme(mode) {
-  if (mode === "teal") {
-    document.documentElement.style.setProperty("--accent", "#4fd1c5");
-  }
-  if (mode === "dark") {
-    document.documentElement.style.setProperty("--accent", "#ffffff");
-  }
-}
-
-// Back navigation
-document.addEventListener("keydown", e => {
-  if (e.key === "Escape" && panel.style.display === "flex") {
-    closePanel();
-  }
-});
-</script>
 </body>
 </html>
