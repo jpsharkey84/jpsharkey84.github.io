@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Crystal Domain</title>
+    <title>Crystal Domain Terminal</title>
     <style>
         :root {
             --blue-grad: linear-gradient(180deg, #0000ad 0%, #00004a 100%);
-            --gold: #f7d308;
             --cyan: #00f2ff;
+            --gold: #f7d308;
+            --m-magic: #00ff44;
+            --m-cmd: #ffff00;
+            --m-sum: #ff0000;
         }
 
         body, html {
@@ -18,64 +21,69 @@
             overflow: hidden;
         }
 
-        /* --- THE CRYSTAL DOMAIN (BACKGROUND) --- */
+        /* --- 1. CRYSTAL DOMAIN BACKGROUND --- */
         .stage {
             position: fixed; width: 100vw; height: 100vh;
             background: radial-gradient(circle at 50% 20%, #4a3018 0%, #000 85%);
             z-index: -1; perspective: 1000px;
         }
 
-        /* Infinite Glass Floor */
-        .glass-floor {
+        /* The Glassway */
+        .floor {
             position: absolute; bottom: -25%; left: -50%; width: 200%; height: 100%;
             background-image: 
                 linear-gradient(var(--cyan) 1px, transparent 1px),
                 linear-gradient(90deg, var(--cyan) 1px, transparent 1px);
-            background-size: 70px 70px;
+            background-size: 80px 80px;
             transform: rotateX(75deg);
-            animation: flow 10s linear infinite;
+            animation: flow 12s linear infinite;
             opacity: 0.3;
         }
-        @keyframes flow { from { background-position: 0 0; } to { background-position: 0 70px; } }
+        @keyframes flow { from { background-position: 0 0; } to { background-position: 0 80px; } }
 
-        /* Glowing Spires */
+        /* Spires */
         .spire {
-            position: absolute; bottom: 15%; width: 3px; height: 40vh;
+            position: absolute; bottom: 10%; width: 3px; height: 45vh;
             background: linear-gradient(to top, var(--cyan), transparent);
-            box-shadow: 0 0 20px var(--cyan);
-            animation: breathe 4s infinite alternate ease-in-out;
+            box-shadow: 0 0 25px var(--cyan);
+            animation: pulse 5s infinite alternate ease-in-out;
         }
-        .spire-l { left: 15%; }
-        .spire-r { right: 15%; animation-delay: 2s; }
-        @keyframes breathe { from { opacity: 0.2; height: 40vh; } to { opacity: 0.7; height: 55vh; } }
+        .spire-l { left: 18%; }
+        .spire-r { right: 18%; animation-delay: 2.5s; }
+        @keyframes pulse { from { opacity: 0.2; transform: scaleY(0.9); } to { opacity: 0.8; transform: scaleY(1.2); } }
 
-        /* Floating Data Particles */
-        .particle {
+        /* Data Stream */
+        .data {
             position: absolute; width: 2px; height: 2px; background: #fff;
-            border-radius: 50%; opacity: 0.5; animation: rise 5s infinite linear;
+            border-radius: 50%; opacity: 0; animation: rise 6s infinite linear;
         }
-        @keyframes rise { from { transform: translateY(100vh); opacity: 0; } to { transform: translateY(-10vh); opacity: 0.5; } }
+        @keyframes rise { 
+            0% { transform: translateY(100vh); opacity: 0; } 
+            50% { opacity: 0.6; } 
+            100% { transform: translateY(-10vh); opacity: 0; } 
+        }
 
-        /* --- THE UI (FOREGROUND) --- */
-        .ui-root {
+        /* --- 2. THE UI TERMINAL --- */
+        .wrapper {
             position: relative; z-index: 10;
             display: flex; flex-direction: column; align-items: center;
             height: 100vh; padding: 20px; box-sizing: border-box;
         }
 
         .window {
-            width: 100%; max-width: 400px;
+            width: 100%; max-width: 410px;
             background: var(--blue-grad);
             border: 3px double #fff; border-radius: 6px;
-            padding: 15px; margin-bottom: 15px;
-            box-shadow: 8px 8px 0px rgba(0,0,0,0.5);
+            padding: 15px; margin-bottom: 12px;
+            box-shadow: 8px 8px 0px rgba(0,0,0,0.6);
             box-sizing: border-box;
+            animation: float 4s infinite ease-in-out;
         }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 
         .header {
-            font-size: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.3);
-            margin-bottom: 10px; padding-bottom: 5px;
-            display: flex; justify-content: space-between;
+            font-size: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding-bottom: 5px; margin-bottom: 10px; display: flex; justify-content: space-between;
         }
 
         .tile {
@@ -85,12 +93,12 @@
 
         /* ☞ THE CURSOR */
         .cursor {
-            position: absolute; left: -30px; top: 12px;
-            font-size: 1.5rem; display: none;
-            animation: point 0.4s infinite alternate;
+            position: absolute; left: -35px; top: 12px;
+            font-size: 1.8rem; display: none;
+            animation: point 0.5s infinite alternate;
         }
         .tile:focus-within .cursor { display: block; }
-        @keyframes point { from { transform: translateX(0); } to { transform: translateX(-5px); } }
+        @keyframes point { from { transform: translateX(0); } to { transform: translateX(-8px); } }
 
         input {
             background: transparent; border: none; color: #fff;
@@ -98,253 +106,80 @@
             text-transform: uppercase;
         }
 
-        /* MATERIA SLOTS */
-        .materia-row { display: flex; gap: 10px; margin-top: 5px; }
+        /* Materia */
+        .m-row { display: flex; gap: 12px; margin-top: 8px; }
         .slot {
-            width: 22px; height: 22px; border-radius: 50%;
-            border: 2px solid #fff; cursor: pointer;
+            width: 24px; height: 24px; border-radius: 50%;
+            border: 2px solid #fff; cursor: pointer; transition: 0.2s;
         }
-        .magic { background: radial-gradient(circle, #00ff44, #004411); box-shadow: 0 0 8px #00ff44; }
-        .summon { background: radial-gradient(circle, #ff0000, #440000); box-shadow: 0 0 8px #ff0000; }
-        .command { background: radial-gradient(circle, #ffff00, #444400); box-shadow: 0 0 8px #ffff00; }
+        .magic { background: radial-gradient(circle, var(--m-magic), #003311); box-shadow: 0 0 10px var(--m-magic); }
+        .cmd { background: radial-gradient(circle, var(--m-cmd), #333300); box-shadow: 0 0 10px var(--m-cmd); }
+        .sum { background: radial-gradient(circle, var(--m-sum), #330000); box-shadow: 0 0 10px var(--m-sum); }
         .empty { background: rgba(255,255,255,0.1); border: 1px dashed #fff; }
 
-        .btn-save {
-            margin-top: auto; width: 100%; max-width: 400px;
-            padding: 15px; background: #eee; color: #000;
-            border: 4px outset #fff; font-weight: bold; cursor: pointer;
-            text-transform: uppercase; font-family: inherit;
+        .btn-sync {
+            margin-top: auto; width: 100%; max-width: 410px;
+            padding: 18px; background: #fff; color: #000;
+            border: 4px outset #ccc; font-weight: bold; font-family: inherit;
+            text-transform: uppercase; cursor: pointer;
         }
-        .btn-save:active { border-style: inset; transform: translate(2px, 2px); }
+        .btn-sync:active { border-style: inset; transform: translate(2px, 2px); }
     </style>
 </head>
 <body>
 
     <div class="stage">
-        <div class="glass-floor"></div>
+        <div class="floor"></div>
         <div class="spire spire-l"></div>
         <div class="spire spire-r"></div>
-        <div class="particle" style="left: 10%; animation-delay: 1s;"></div>
-        <div class="particle" style="left: 30%; animation-delay: 3s;"></div>
-        <div class="particle" style="left: 50%; animation-delay: 0s;"></div>
-        <div class="particle" style="left: 70%; animation-delay: 2s;"></div>
-        <div class="particle" style="left: 90%; animation-delay: 4s;"></div>
+        <div class="data" style="left:15%; animation-delay:0s;"></div>
+        <div class="data" style="left:40%; animation-delay:2s;"></div>
+        <div class="data" style="left:65%; animation-delay:4s;"></div>
+        <div class="data" style="left:85%; animation-delay:1s;"></div>
     </div>
 
-    <div class="ui-root">
+    <div class="wrapper">
         <div class="window">
-            <div class="header"><span>SYSTEM TERMINAL</span><span>LV 99</span></div>
+            <div class="header"><span>CRYSTAL DOMAIN</span><span>LV 99</span></div>
             <div class="tile">
                 <div class="cursor">☞</div>
                 <input type="text" value="CLOUD_STRIFE">
             </div>
             <div class="tile">
                 <div class="cursor">☞</div>
-                <div class="materia-row">
+                <div class="m-row">
                     <div class="slot magic" onclick="cycle(this)" data-type="magic"></div>
-                    <div class="slot summon" onclick="cycle(this)" data-type="summon"></div>
-                    <div class="slot command" onclick="cycle(this)" data-type="command"></div>
+                    <div class="slot sum" onclick="cycle(this)" data-type="sum"></div>
+                    <div class="slot cmd" onclick="cycle(this)" data-type="cmd"></div>
                     <div class="slot empty" onclick="cycle(this)" data-type="empty"></div>
                 </div>
             </div>
         </div>
 
         <div class="window" style="flex-grow: 1;">
-            <div class="header"><span>ITEM LOGS</span></div>
+            <div class="header"><span>INVENTORY DROPS</span></div>
             <div class="tile">
                 <div class="cursor">☞</div>
                 <div style="display:flex; justify-content:space-between;">
                     <span>ETHER CRYSTAL</span> <span style="color:var(--gold)">x 99</span>
                 </div>
             </div>
-        </div>
-
-        <button class="btn-save" onclick="sync(this)">Execute System Sync</button>
-    </div>
-
-    <script>
-        function cycle(el) {
-            const types = ['empty', 'magic', 'command', 'summon'];
-            let next = types[(types.indexOf(el.getAttribute('data-type')) + 1) % types.length];
-            el.setAttribute('data-type', next);
-            el.className = 'slot ' + next;
-        }
-
-        function sync(btn) {
-            btn.innerText = "SYNCING...";
-            setTimeout(() => { btn.innerText = "SYNC COMPLETE"; }, 1000);
-        }
-    </script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Crystal Domain</title>
-    <style>
-        :root {
-            --blue-grad: linear-gradient(180deg, #0000ad 0%, #00004a 100%);
-            --gold: #f7d308;
-            --cyan: #00f2ff;
-        }
-
-        body, html {
-            margin: 0; padding: 0; width: 100%; height: 100%;
-            background: #000; color: #fff;
-            font-family: 'Courier New', Courier, monospace;
-            overflow: hidden;
-        }
-
-        /* --- THE CRYSTAL DOMAIN (BACKGROUND) --- */
-        .stage {
-            position: fixed; width: 100vw; height: 100vh;
-            background: radial-gradient(circle at 50% 20%, #4a3018 0%, #000 85%);
-            z-index: -1; perspective: 1000px;
-        }
-
-        /* Infinite Glass Floor */
-        .glass-floor {
-            position: absolute; bottom: -25%; left: -50%; width: 200%; height: 100%;
-            background-image: 
-                linear-gradient(var(--cyan) 1px, transparent 1px),
-                linear-gradient(90deg, var(--cyan) 1px, transparent 1px);
-            background-size: 70px 70px;
-            transform: rotateX(75deg);
-            animation: flow 10s linear infinite;
-            opacity: 0.3;
-        }
-        @keyframes flow { from { background-position: 0 0; } to { background-position: 0 70px; } }
-
-        /* Glowing Spires */
-        .spire {
-            position: absolute; bottom: 15%; width: 3px; height: 40vh;
-            background: linear-gradient(to top, var(--cyan), transparent);
-            box-shadow: 0 0 20px var(--cyan);
-            animation: breathe 4s infinite alternate ease-in-out;
-        }
-        .spire-l { left: 15%; }
-        .spire-r { right: 15%; animation-delay: 2s; }
-        @keyframes breathe { from { opacity: 0.2; height: 40vh; } to { opacity: 0.7; height: 55vh; } }
-
-        /* Floating Data Particles */
-        .particle {
-            position: absolute; width: 2px; height: 2px; background: #fff;
-            border-radius: 50%; opacity: 0.5; animation: rise 5s infinite linear;
-        }
-        @keyframes rise { from { transform: translateY(100vh); opacity: 0; } to { transform: translateY(-10vh); opacity: 0.5; } }
-
-        /* --- THE UI (FOREGROUND) --- */
-        .ui-root {
-            position: relative; z-index: 10;
-            display: flex; flex-direction: column; align-items: center;
-            height: 100vh; padding: 20px; box-sizing: border-box;
-        }
-
-        .window {
-            width: 100%; max-width: 400px;
-            background: var(--blue-grad);
-            border: 3px double #fff; border-radius: 6px;
-            padding: 15px; margin-bottom: 15px;
-            box-shadow: 8px 8px 0px rgba(0,0,0,0.5);
-            box-sizing: border-box;
-        }
-
-        .header {
-            font-size: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.3);
-            margin-bottom: 10px; padding-bottom: 5px;
-            display: flex; justify-content: space-between;
-        }
-
-        .tile {
-            background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1);
-            padding: 12px; margin-bottom: 8px; position: relative;
-        }
-
-        /* ☞ THE CURSOR */
-        .cursor {
-            position: absolute; left: -30px; top: 12px;
-            font-size: 1.5rem; display: none;
-            animation: point 0.4s infinite alternate;
-        }
-        .tile:focus-within .cursor { display: block; }
-        @keyframes point { from { transform: translateX(0); } to { transform: translateX(-5px); } }
-
-        input {
-            background: transparent; border: none; color: #fff;
-            width: 100%; font-family: inherit; font-size: 1.1rem; outline: none;
-            text-transform: uppercase;
-        }
-
-        /* MATERIA SLOTS */
-        .materia-row { display: flex; gap: 10px; margin-top: 5px; }
-        .slot {
-            width: 22px; height: 22px; border-radius: 50%;
-            border: 2px solid #fff; cursor: pointer;
-        }
-        .magic { background: radial-gradient(circle, #00ff44, #004411); box-shadow: 0 0 8px #00ff44; }
-        .summon { background: radial-gradient(circle, #ff0000, #440000); box-shadow: 0 0 8px #ff0000; }
-        .command { background: radial-gradient(circle, #ffff00, #444400); box-shadow: 0 0 8px #ffff00; }
-        .empty { background: rgba(255,255,255,0.1); border: 1px dashed #fff; }
-
-        .btn-save {
-            margin-top: auto; width: 100%; max-width: 400px;
-            padding: 15px; background: #eee; color: #000;
-            border: 4px outset #fff; font-weight: bold; cursor: pointer;
-            text-transform: uppercase; font-family: inherit;
-        }
-        .btn-save:active { border-style: inset; transform: translate(2px, 2px); }
-    </style>
-</head>
-<body>
-
-    <div class="stage">
-        <div class="glass-floor"></div>
-        <div class="spire spire-l"></div>
-        <div class="spire spire-r"></div>
-        <div class="particle" style="left: 10%; animation-delay: 1s;"></div>
-        <div class="particle" style="left: 30%; animation-delay: 3s;"></div>
-        <div class="particle" style="left: 50%; animation-delay: 0s;"></div>
-        <div class="particle" style="left: 70%; animation-delay: 2s;"></div>
-        <div class="particle" style="left: 90%; animation-delay: 4s;"></div>
-    </div>
-
-    <div class="ui-root">
-        <div class="window">
-            <div class="header"><span>SYSTEM TERMINAL</span><span>LV 99</span></div>
-            <div class="tile">
-                <div class="cursor">☞</div>
-                <input type="text" value="CLOUD_STRIFE">
-            </div>
-            <div class="tile">
-                <div class="cursor">☞</div>
-                <div class="materia-row">
-                    <div class="slot magic" onclick="cycle(this)" data-type="magic"></div>
-                    <div class="slot summon" onclick="cycle(this)" data-type="summon"></div>
-                    <div class="slot command" onclick="cycle(this)" data-type="command"></div>
-                    <div class="slot empty" onclick="cycle(this)" data-type="empty"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="window" style="flex-grow: 1;">
-            <div class="header"><span>ITEM LOGS</span></div>
             <div class="tile">
                 <div class="cursor">☞</div>
                 <div style="display:flex; justify-content:space-between;">
-                    <span>ETHER CRYSTAL</span> <span style="color:var(--gold)">x 99</span>
+                    <span>PHOENIX DOWN</span> <span style="color:var(--gold)">x 05</span>
                 </div>
             </div>
         </div>
 
-        <button class="btn-save" onclick="sync(this)">Execute System Sync</button>
+        <button class="btn-sync" onclick="sync(this)">Execute System Sync</button>
     </div>
 
     <script>
         function cycle(el) {
-            const types = ['empty', 'magic', 'command', 'summon'];
-            let next = types[(types.indexOf(el.getAttribute('data-type')) + 1) % types.length];
+            const types = ['empty', 'magic', 'cmd', 'sum'];
+            let current = el.getAttribute('data-type');
+            let next = types[(types.indexOf(current) + 1) % types.length];
             el.setAttribute('data-type', next);
             el.className = 'slot ' + next;
         }
