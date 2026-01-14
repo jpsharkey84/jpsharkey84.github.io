@@ -5,138 +5,144 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         :root {
-            --glass: rgba(255, 255, 255, 0.1);
-            --border: rgba(255, 255, 255, 0.4);
-            --glow: #4ae3ff;
-            --text: #e0fbff;
+            --core-cyan: #4ae3ff;
+            --deep-void: #000a1a;
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(74, 227, 255, 0.3);
         }
 
         body {
-            margin: 0; padding: 0;
-            background: radial-gradient(circle at center, #001a33 0%, #000 100%);
-            font-family: 'Segoe UI', sans-serif;
-            color: var(--text);
-            display: flex; justify-content: center;
-            overflow: hidden; height: 100vh;
+            margin: 0; padding: 0; background: var(--deep-void);
+            font-family: 'Inter', -apple-system, sans-serif;
+            color: white; overflow: hidden; height: 100vh;
+            display: flex; flex-direction: column; align-items: center;
         }
 
-        /* 1. THE GLASSWAY BACKGROUND ANIMATION */
-        .glassway {
-            position: absolute; width: 100%; height: 100%;
-            background: 
-                linear-gradient(90deg, transparent 49%, rgba(74, 227, 255, 0.1) 50%, transparent 51%),
-                linear-gradient(0deg, transparent 49%, rgba(74, 227, 255, 0.1) 50%, transparent 51%);
-            background-size: 80px 80px;
-            transform: perspective(500px) rotateX(60deg);
-            animation: move-tiles 10s linear infinite;
-            z-index: -1;
+        /* 1. THE MOVING GLASSWAY FLOOR */
+        .floor-grid {
+            position: fixed; bottom: 0; width: 200%; height: 60%;
+            background-image: 
+                linear-gradient(var(--border-glow) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border-glow) 1px, transparent 1px);
+            background-size: 60px 60px;
+            transform: perspective(300px) rotateX(65deg) translateX(-25%);
+            animation: walk 8s linear infinite;
+            z-index: -1; opacity: 0.5;
         }
 
-        @keyframes move-tiles {
-            from { background-position: 0 0; }
-            to { background-position: 0 80px; }
+        @keyframes walk {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 60px; }
         }
 
-        /* 2. THE MAIN BOARD (BREATHING PANEL) */
-        .ui-board {
-            width: 90vw; max-width: 420px;
-            margin-top: 5vh; height: 85vh;
-            background: var(--glass);
-            backdrop-filter: blur(15px);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            box-shadow: 0 0 20px rgba(74, 227, 255, 0.2);
+        /* 2. THE ADDITIVE BOARD */
+        .board-wrapper {
+            width: 90%; max-width: 400px;
+            margin-top: 40px; height: 80vh;
             display: flex; flex-direction: column;
-            animation: breathe 4s ease-in-out infinite;
+            gap: 15px;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            animation: breathe 5s ease-in-out infinite;
         }
 
         @keyframes breathe {
-            0%, 100% { box-shadow: 0 0 20px rgba(74, 227, 255, 0.2); transform: scale(1); }
-            50% { box-shadow: 0 0 40px rgba(74, 227, 255, 0.4); transform: scale(1.01); }
+            0%, 100% { transform: translateY(0); box-shadow: 0 0 10px var(--border-glow); }
+            50% { transform: translateY(-5px); box-shadow: 0 0 25px var(--core-cyan); }
         }
 
-        /* 3. INTERACTIVE TILES (DROPS & VALUES) */
-        .tile {
-            background: rgba(255, 255, 255, 0.05);
-            margin: 10px; padding: 15px;
-            border-radius: 12px;
-            border: 1px solid transparent;
-            transition: 0.3s;
+        /* 3. ADDITIVE VALUES (INPUTS) */
+        .stat-input-group {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 10px 0; transition: 0.3s;
         }
 
-        .tile:active { border-color: var(--glow); background: rgba(74, 227, 255, 0.1); }
-
-        .label { font-size: 0.7rem; letter-spacing: 2px; color: var(--glow); text-transform: uppercase; }
+        .stat-input-group:focus-within {
+            border-bottom: 1px solid var(--core-cyan);
+            text-shadow: 0 0 8px var(--core-cyan);
+        }
 
         input, select {
-            width: 100%; background: transparent; border: none;
-            color: white; font-size: 1.2rem; padding: 5px 0;
-            outline: none; font-family: inherit;
+            background: transparent; border: none; color: var(--core-cyan);
+            font-size: 1.1rem; text-align: right; outline: none;
+            font-weight: bold; width: 60%;
         }
 
-        /* 4. THE BEACON SPIRES (GLOW BUTTONS) */
-        .beacon-btn {
-            background: linear-gradient(45deg, #00d4ff, #004e92);
-            border: none; color: white; padding: 15px;
-            margin: 10px; border-radius: 12px;
-            font-weight: bold; letter-spacing: 2px;
-            text-shadow: 0 0 10px #fff;
-            animation: spire-glow 3s infinite alternate;
+        label { font-size: 0.75rem; color: #888; letter-spacing: 1px; }
+
+        /* 4. THE BEACON SPIRE BUTTON */
+        .beacon-spire {
+            position: relative; width: 100%; height: 70px;
+            background: linear-gradient(to top, #004e92, #00d4ff);
+            border: none; border-radius: 12px; margin-top: auto;
+            color: white; font-weight: bold; font-size: 1.2rem;
+            letter-spacing: 4px; overflow: hidden;
+            box-shadow: 0 0 20px var(--core-cyan);
+            cursor: pointer;
         }
 
-        @keyframes spire-glow {
-            from { filter: brightness(1) drop-shadow(0 0 5px var(--glow)); }
-            to { filter: brightness(1.5) drop-shadow(0 0 20px var(--glow)); }
+        .beacon-spire::after {
+            content: ''; position: absolute; top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shine 3s infinite;
         }
 
-        .scroll-area { flex: 1; overflow-y: auto; padding-bottom: 20px; }
+        @keyframes shine {
+            0% { left: -100%; }
+            20% { left: 100%; }
+            100% { left: 100%; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="glassway"></div>
+    <div class="floor-grid"></div>
 
-    <div class="ui-board">
-        <div style="text-align:center; padding: 20px; font-weight: 200; font-size: 1.5rem;">STATUS COMMAND</div>
-        
-        <div class="scroll-area">
-            <div class="tile">
-                <span class="label">Identity Pin</span>
-                <input type="text" value="CLOUD_07">
+    <div class="board-wrapper">
+        <div class="glass-panel">
+            <div class="stat-input-group">
+                <label>SYSTEM ID</label>
+                <input type="text" value="CLOUD_STRIFE">
             </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr;">
-                <div class="tile">
-                    <span class="label">Level</span>
-                    <input type="number" value="99">
-                </div>
-                <div class="tile">
-                    <span class="label">Integrity</span>
-                    <input type="number" value="255">
-                </div>
+            <div class="stat-input-group">
+                <label>CORE LV</label>
+                <input type="number" value="99">
             </div>
+        </div>
 
-            <div class="tile">
-                <span class="label">Active Blade Equiv.</span>
+        <div class="glass-panel" style="flex: 1;">
+            <div class="stat-input-group">
+                <label>ACTIVE BLADE</label>
                 <select>
-                    <option>BUSTER_G1</option>
-                    <option>HARDEDGE_RE</option>
-                    <option>ULTIMA_CORE</option>
+                    <option>BUSTER SWORD</option>
+                    <option>Masmune</option>
+                    <option>ULTIMA WEAPON</option>
                 </select>
             </div>
-
-            <div class="tile" style="opacity: 0.7;">
-                <span class="label">Inventory Drops</span>
-                <div style="display:flex; justify-content:space-between; margin-top:10px;">
-                    <span>Ether Core</span> <span>x 99</span>
+            
+            <div style="margin-top: 20px;">
+                <label style="display:block; margin-bottom: 10px;">ADDITIVE DROPS</label>
+                <div style="display:flex; justify-content:space-between; opacity: 0.6; margin-bottom: 8px;">
+                    <span>Phoenix Pin</span> <span>x 99</span>
                 </div>
-                <div style="display:flex; justify-content:space-between; margin-top:10px;">
-                    <span>Hi-Potion</span> <span>x 50</span>
+                <div style="display:flex; justify-content:space-between; opacity: 0.6;">
+                    <span>Ether Crystal</span> <span>x 42</span>
                 </div>
             </div>
         </div>
 
-        <button class="beacon-btn">INITIATE UPDATE</button>
+        <button class="beacon-spire" onclick="this.style.filter = 'hue-rotate(180deg)'">
+            SYNC STATUS
+        </button>
     </div>
 
 </body>
