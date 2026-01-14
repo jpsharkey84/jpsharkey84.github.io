@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+</body
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -166,5 +167,5 @@
             el.className = 'slot ' + next;
         }
     </script>
-</body>
+ /body>
 </html>
