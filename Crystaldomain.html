@@ -3,147 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OG Status Board</title>
     <style>
         :root {
-            --core-cyan: #4ae3ff;
-            --deep-void: #000a1a;
-            --glass-bg: rgba(255, 255, 255, 0.08);
-            --border-glow: rgba(74, 227, 255, 0.3);
+            --og-blue: linear-gradient(180deg, #0000ad 0%, #00004a 100%);
+            --og-border: #ffffff;
+            --og-yellow: #ffff00;
+            --og-green: #00ff00;
+            --materia-magic: #00ff44;
+            --materia-command: #ffff00;
+            --materia-summon: #ff0000;
         }
 
         body {
-            margin: 0; padding: 0; background: var(--deep-void);
-            font-family: 'Inter', -apple-system, sans-serif;
+            margin: 0; padding: 0; background: #000;
+            font-family: 'Courier New', Courier, monospace;
             color: white; overflow: hidden; height: 100vh;
-            display: flex; flex-direction: column; align-items: center;
+            display: flex; justify-content: center;
         }
 
-        /* 1. THE MOVING GLASSWAY FLOOR */
-        .floor-grid {
-            position: fixed; bottom: 0; width: 200%; height: 60%;
-            background-image: 
-                linear-gradient(var(--border-glow) 1px, transparent 1px),
-                linear-gradient(90deg, var(--border-glow) 1px, transparent 1px);
-            background-size: 60px 60px;
-            transform: perspective(300px) rotateX(65deg) translateX(-25%);
-            animation: walk 8s linear infinite;
-            z-index: -1; opacity: 0.5;
+        /* 1. THE MOVING FLOOR */
+        .glassway {
+            position: fixed; bottom: 0; width: 200%; height: 50%;
+            background-image: linear-gradient(rgba(0, 255, 255, 0.15) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0, 255, 255, 0.15) 1px, transparent 1px);
+            background-size: 50px 50px;
+            transform: perspective(400px) rotateX(60deg) translateX(-25%);
+            animation: walk 10s linear infinite;
+            z-index: -1;
         }
+        @keyframes walk { 100% { background-position: 0 50px; } }
 
-        @keyframes walk {
-            0% { background-position: 0 0; }
-            100% { background-position: 0 60px; }
-        }
-
-        /* 2. THE ADDITIVE BOARD */
-        .board-wrapper {
-            width: 90%; max-width: 400px;
-            margin-top: 40px; height: 80vh;
-            display: flex; flex-direction: column;
-            gap: 15px;
-        }
-
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        /* 2. THE MAIN BOARD */
+        .ff-window {
+            width: 92%; max-width: 420px; margin-top: 15px; height: 92vh;
+            background: var(--og-blue);
+            border: 3px double var(--og-border);
+            border-radius: 8px; display: flex; flex-direction: column;
+            padding: 15px; box-shadow: 0 0 25px rgba(0,0,0,1);
             animation: breathe 5s ease-in-out infinite;
         }
+        @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.005); } }
 
-        @keyframes breathe {
-            0%, 100% { transform: translateY(0); box-shadow: 0 0 10px var(--border-glow); }
-            50% { transform: translateY(-5px); box-shadow: 0 0 25px var(--core-cyan); }
+        /* 3. CURSOR FINGER */
+        .cursor-finger {
+            position: absolute; left: -32px; top: 18px;
+            font-size: 1.8rem; animation: finger-point 0.6s infinite alternate;
+            display: none; pointer-events: none; z-index: 10;
         }
+        @keyframes finger-point { from { transform: translateX(0); } to { transform: translateX(-8px); } }
 
-        /* 3. ADDITIVE VALUES (INPUTS) */
-        .stat-input-group {
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding: 10px 0; transition: 0.3s;
+        /* 4. TILES & INPUTS */
+        .tile {
+            background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2);
+            padding: 12px; margin-bottom: 10px; position: relative;
+            box-shadow: inset 2px 2px 0 rgba(255,255,255,0.2);
         }
-
-        .stat-input-group:focus-within {
-            border-bottom: 1px solid var(--core-cyan);
-            text-shadow: 0 0 8px var(--core-cyan);
-        }
-
+        .tile:focus-within .cursor-finger { display: block; }
+        
+        .label { color: var(--og-yellow); font-size: 0.75rem; display: block; margin-bottom: 4px; }
+        
         input, select {
-            background: transparent; border: none; color: var(--core-cyan);
-            font-size: 1.1rem; text-align: right; outline: none;
-            font-weight: bold; width: 60%;
+            background: transparent; border: none; color: #fff;
+            width: 100%; font-family: inherit; font-size: 1.1rem; outline: none;
+            text-transform: uppercase;
         }
+        input:focus { color: var(--og-green); }
 
-        label { font-size: 0.75rem; color: #888; letter-spacing: 1px; }
-
-        /* 4. THE BEACON SPIRE BUTTON */
-        .beacon-spire {
-            position: relative; width: 100%; height: 70px;
-            background: linear-gradient(to top, #004e92, #00d4ff);
-            border: none; border-radius: 12px; margin-top: auto;
-            color: white; font-weight: bold; font-size: 1.2rem;
-            letter-spacing: 4px; overflow: hidden;
-            box-shadow: 0 0 20px var(--core-cyan);
-            cursor: pointer;
+        /* 5. MATERIA SYSTEM */
+        .materia-row { display: flex; gap: 12px; margin-top: 10px; }
+        .materia-slot {
+            width: 24px; height: 24px; border-radius: 50%;
+            border: 2px solid #fff; transition: 0.2s; cursor: pointer;
         }
+        .materia-slot.magic { background: radial-gradient(circle, var(--materia-magic), #004411); box-shadow: 0 0 10px var(--materia-magic); }
+        .materia-slot.command { background: radial-gradient(circle, var(--materia-command), #444400); box-shadow: 0 0 10px var(--materia-command); }
+        .materia-slot.summon { background: radial-gradient(circle, var(--materia-summon), #440000); box-shadow: 0 0 10px var(--materia-summon); }
+        .materia-slot.empty { background: rgba(255,255,255,0.1); border: 1px dashed #fff; }
 
-        .beacon-spire::after {
-            content: ''; position: absolute; top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-            animation: shine 3s infinite;
+        /* 6. THE BEACON BUTTON */
+        .beacon-btn {
+            margin-top: auto; padding: 18px;
+            background: #dcdcdc; border: 4px outset #fff;
+            color: #000; font-weight: bold; text-transform: uppercase;
+            box-shadow: 4px 4px 0px #222; cursor: pointer;
         }
-
-        @keyframes shine {
-            0% { left: -100%; }
-            20% { left: 100%; }
-            100% { left: 100%; }
-        }
+        .beacon-btn:active { border-style: inset; transform: translate(2px, 2px); box-shadow: 1px 1px 0px #222; }
     </style>
 </head>
 <body>
 
-    <div class="floor-grid"></div>
+    <div class="glassway"></div>
 
-    <div class="board-wrapper">
-        <div class="glass-panel">
-            <div class="stat-input-group">
-                <label>SYSTEM ID</label>
-                <input type="text" value="CLOUD_STRIFE">
-            </div>
-            <div class="stat-input-group">
-                <label>CORE LV</label>
+    <div class="ff-window">
+        <div class="tile">
+            <div class="cursor-finger">☞</div>
+            <span class="label">NAME ENTRY</span>
+            <input type="text" value="CLOUD_STRIFE">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="tile">
+                <div class="cursor-finger">☞</div>
+                <span class="label">CORE LV</span>
                 <input type="number" value="99">
             </div>
-        </div>
-
-        <div class="glass-panel" style="flex: 1;">
-            <div class="stat-input-group">
-                <label>ACTIVE BLADE</label>
-                <select>
-                    <option>BUSTER SWORD</option>
-                    <option>Masmune</option>
-                    <option>ULTIMA WEAPON</option>
-                </select>
-            </div>
-            
-            <div style="margin-top: 20px;">
-                <label style="display:block; margin-bottom: 10px;">ADDITIVE DROPS</label>
-                <div style="display:flex; justify-content:space-between; opacity: 0.6; margin-bottom: 8px;">
-                    <span>Phoenix Pin</span> <span>x 99</span>
-                </div>
-                <div style="display:flex; justify-content:space-between; opacity: 0.6;">
-                    <span>Ether Crystal</span> <span>x 42</span>
-                </div>
+            <div class="tile">
+                <div class="cursor-finger">☞</div>
+                <span class="label">HP VALUE</span>
+                <input type="number" value="9999">
             </div>
         </div>
 
-        <button class="beacon-spire" onclick="this.style.filter = 'hue-rotate(180deg)'">
-            SYNC STATUS
-        </button>
+        <div class="tile">
+            <div class="cursor-finger">☞</div>
+            <span class="label">EQUIPMENT: BUSTER SWORD</span>
+            <div class="materia-row">
+                <div class="materia-slot magic" data-type="magic" onclick="cycleMateria(this)"></div>
+                <div class="materia-slot magic" data-type="magic" onclick="cycleMateria(this)"></div>
+                <div class="materia-slot command" data-type="command" onclick="cycleMateria(this)"></div>
+                <div class="materia-slot empty" data-type="empty" onclick="cycleMateria(this)"></div>
+            </div>
+        </div>
+
+        <div class="tile" style="flex-grow: 1; overflow-y: auto;">
+            <div class="cursor-finger">☞</div>
+            <span class="label">INVENTORY DROPS</span>
+            <div style="display:flex; justify-content:space-between; margin-top:12px;">
+                <span>ETHER CRYSTAL</span> <span style="color:var(--og-yellow)">x 99</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-top:12px;">
+                <span>PHOENIX PIN</span> <span style="color:var(--og-yellow)">x 05</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-top:12px;">
+                <span>ELIXIR</span> <span style="color:var(--og-yellow)">x 12</span>
+            </div>
+        </div>
+
+        <button class="beacon-btn" onclick="triggerSync(this)">Execute Sync</button>
     </div>
 
+    <script>
+        // Materia Cycle Logic
+        function cycleMateria(el) {
+            const types = ['empty', 'magic', 'command', 'summon'];
+            let current = el.getAttribute('data-type');
+            let nextIndex = (types.indexOf(current) + 1) % types.length;
+            let nextType = types[nextIndex];
+            
+            el.setAttribute('data-type', nextType);
+            el.className = 'materia-slot ' + nextType;
+            
+            // Visual pop
+            el.style.transform = 'scale(1.2)';
+            setTimeout(() => el.style.transform = 'scale(1)', 150);
+        }
+
+        // Button Sync Logic
+        function triggerSync(btn) {
+            btn.innerText = "SYNCING...";
+            btn.style.filter = "invert(1)";
+            setTimeout(() => {
+                btn.innerText = "EXECUTE SYNC";
+                btn.style.filter = "invert(0)";
+                alert("SYSTEM STATUS UPDATED");
+            }, 1000);
+        }
+    </script>
 </body>
 </html>
