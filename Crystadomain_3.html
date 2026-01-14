@@ -2,238 +2,242 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Crystal Domain | Archive of Ages</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crystal Domain OS</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        /* PIXEL ART FONT */
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 
         :root {
-            --panel-blue: rgba(74, 103, 153, 0.85);
-            --border-light: #9ab4d8;
-            --text-white: #e0eaf5;
-            --font-pixel: 'Press Start 2P', cursive;
+            --ui-blue: #4a6799;
+            --ui-bg: rgba(74, 103, 153, 0.9);
+            --ui-border: #9ab4d8;
+            --highlight: #cedef0;
+            --gold: #ffd700;
         }
 
         body, html {
             margin: 0; padding: 0;
             width: 100vw; height: 100vh;
             overflow: hidden;
-            background-color: #000;
-            font-family: 'Courier New', Courier, monospace; /* Main text */
+            font-family: 'VT323', monospace;
+            background: #000;
         }
 
-        /* THE WORLD */
-        .world-container {
+        /* LIVING BACKGROUND */
+        .world {
             position: relative;
             width: 100%; height: 100%;
-            background: url('background.png') no-repeat center center;
+            background: url('https://i.imgur.com/n6L98jJ.png') no-repeat center center;
             background-size: cover;
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
+            display: flex; justify-content: center; align-items: flex-end;
         }
 
-        /* ADDING DIMENSION: Moving Clouds Overlay */
-        .world-container::after {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; width: 200%; height: 100%;
+        /* CLOUD DRIFT EFFECT */
+        .clouds {
+            position: absolute; inset: 0;
             background: url('https://www.transparenttextures.com/patterns/clouds.png');
-            opacity: 0.1;
-            animation: drift 60s linear infinite;
-            pointer-events: none;
+            opacity: 0.2; pointer-events: none;
+            animation: drift 100s linear infinite;
         }
 
-        @keyframes drift {
-            from { transform: translateX(0); }
-            to { transform: translateX(-50%); }
+        /* BLIMP ANIMATION */
+        .blimp-layer {
+            position: absolute; top: 10%; right: 15%;
+            width: 200px; height: 100px;
+            background: url('https://i.imgur.com/your-blimp-cutout.png') no-repeat; /* Optional asset */
+            animation: bob 4s ease-in-out infinite;
         }
 
-        /* THE UI OVERLAY - Positioned exactly like the image */
+        @keyframes drift { from { background-position: 0 0; } to { background-position: 10000px 0; } }
+        @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+
+        /* THE UI INTERFACE */
         .interface {
-            position: absolute;
-            bottom: 40px;
-            width: 90%;
-            max-width: 1000px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
+            position: relative; width: 100%; max-width: 900px;
+            display: flex; justify-content: space-between;
+            padding: 0 40px 60px 40px;
             z-index: 10;
         }
 
-        /* PANEL STYLING */
         .panel {
-            background: var(--panel-blue);
-            border: 4px solid var(--border-light);
-            border-radius: 12px;
-            width: 320px;
-            padding: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background: var(--ui-bg);
+            border: 4px solid var(--ui-border);
+            border-radius: 8px;
+            padding: 12px;
+            width: 380px;
+            box-shadow: 0 10px 0 rgba(0,0,0,0.3);
         }
 
-        .panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid var(--border-light);
-            padding-bottom: 8px;
-            margin-bottom: 12px;
-            font-family: var(--font-pixel);
-            font-size: 12px;
-            letter-spacing: 1px;
+        .panel-top {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid var(--ui-border);
+            padding-bottom: 6px; margin-bottom: 12px;
+            font-size: 24px; color: var(--highlight);
         }
 
-        /* LEFT PANEL: NAVIGATION & UTILITY */
-        .nav-list { display: flex; flex-direction: column; gap: 6px; }
-        .nav-item {
-            background: rgba(255,255,255,0.15);
-            border: 2px solid var(--border-light);
-            border-radius: 6px;
-            padding: 8px 12px;
-            color: white;
+        /* LEFT PANEL: NAVIGATION */
+        .nav-list { display: flex; flex-direction: column; gap: 8px; }
+        .nav-btn {
+            background: rgba(0,0,0,0.2);
+            border: 2px solid var(--ui-border);
+            color: white; padding: 10px;
+            text-align: left; font-size: 22px; cursor: pointer;
             text-transform: uppercase;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-            text-align: left;
         }
-        .nav-item.active { background: #cedef0; color: #4a6799; }
-        .nav-item:hover { background: rgba(255,255,255,0.3); }
+        .nav-btn:hover, .nav-btn.active { background: var(--highlight); color: var(--ui-blue); }
 
-        /* RIGHT PANEL: STATUS & LOGGING */
-        .date-row { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
-        .mood-row { font-size: 13px; opacity: 0.9; margin-bottom: 15px; font-style: italic; }
+        /* RIGHT PANEL: STATUS */
+        .date-display { font-size: 32px; color: white; margin-bottom: 4px; }
+        .mood-display { font-size: 20px; color: var(--gold); margin-bottom: 15px; }
 
-        .button-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-bottom: 15px;
+        .btn-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 15px; }
+        .stat-btn {
+            background: rgba(0,0,0,0.2); border: 2px solid var(--ui-border);
+            color: white; padding: 6px; font-size: 18px; cursor: pointer;
         }
+        .stat-btn.active { background: white; color: var(--ui-blue); }
 
-        .toggle-btn {
-            background: rgba(255,255,255,0.1);
-            border: 1px solid var(--border-light);
-            color: white;
-            padding: 6px;
-            font-size: 11px;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-        .toggle-btn.active { background: #fff; color: #4a6799; border-color: #fff; }
-
-        .save-day-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 10px;
-        }
-
+        .footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
         .save-btn {
-            background: #cedef0;
-            border: none;
-            padding: 8px 25px;
-            border-radius: 6px;
-            font-weight: bold;
-            color: #4a6799;
-            cursor: pointer;
+            background: var(--highlight); border: none; padding: 10px 30px;
+            font-family: 'VT323'; font-size: 22px; cursor: pointer; border-radius: 4px;
         }
+        .chick { font-size: 40px; animation: bounce 0.6s infinite alternate; cursor: pointer; }
+        @keyframes bounce { from { transform: scale(1); } to { transform: scale(1.1) translateY(-5px); } }
 
-        .chick { font-size: 24px; animation: bounce 0.8s infinite alternate; }
-        @keyframes bounce { to { transform: translateY(-5px); } }
+        /* CONTENT OVERLAYS */
+        .backpack-content { display: none; margin-top: 10px; }
+        .active-view { display: block; }
 
     </style>
 </head>
 <body>
 
-    <div class="world-container">
-        <div class="interface">
+<div class="world">
+    <div class="clouds"></div>
+    <div class="blimp-layer"></div>
+
+    <div class="interface">
+        
+        <div class="panel">
+            <div class="panel-top">
+                <span>⚔️ BEACONS</span>
+                <span>☰</span>
+            </div>
+            <div class="nav-list" id="nav-list">
+                <button class="nav-btn" onclick="switchView('today')">TODAY</button>
+                <button class="nav-btn" onclick="switchView('logs')">LOGS</button>
+                <button class="nav-btn active" id="backpack-trigger" onclick="switchView('backpack')">BACKPACK</button>
+                <button class="nav-btn">FLOW</button>
+                <button class="nav-btn">MONEY</button>
+            </div>
             
-            <div class="panel">
-                <div class="panel-header">
-                    <span>⚔️</span>
-                    <span>BEACONS</span>
-                    <span>📑</span>
-                </div>
-                <div class="nav-list">
-                    <div class="nav-item">Today</div>
-                    <div class="nav-item">Logs</div>
-                    <div class="nav-item active">Logs</div>
-                    <div class="nav-item">Backpack</div>
-                    <div class="nav-item">Flow</div>
-                    <div class="nav-item">Money</div>
-                </div>
-                <div style="text-align: right; margin-top: 10px;">
-                    <img src="https://cur.cursors-4u.net/arrow/arr-2/arr143.png" width="20">
-                </div>
+            <div id="backpack-zone" class="backpack-content">
+                <input type="text" id="taskInput" placeholder="+ ADD ITEM" 
+                       style="width:100%; background:transparent; border:1px solid #fff; color:#fff; font-family:'VT323'; font-size:20px; padding:5px;">
+                <ul id="itemList" style="list-style:none; padding:0; font-size:20px;"></ul>
             </div>
-
-            <div class="panel">
-                <div class="panel-header">
-                    <span>🛡️</span>
-                    <span>DOMAIN STATUS</span>
-                    <span>📑</span>
-                </div>
-                <div class="date-row" id="real-date">Sun Jan 14 2026</div>
-                <div class="mood-row">Mood: <span id="mood-text">Orange Flow</span></div>
-                
-                <div class="button-grid">
-                    <button class="toggle-btn active">Active</button>
-                    <button class="toggle-btn">Idle</button>
-                    <button class="toggle-btn">Paused</button>
-                    
-                    <button class="toggle-btn">Rain</button>
-                    <button class="toggle-btn active">Sun</button>
-                    <button class="toggle-btn">Grey</button>
-                    
-                    <button class="toggle-btn">Steady</button>
-                    <button class="toggle-btn active">Flowing</button>
-                    <button class="toggle-btn">Low</button>
-                </div>
-
-                <div class="save-day-container">
-                    <button class="save-btn" onclick="saveArchive()">Save Day</button>
-                    <div class="chick">🐥</div>
-                </div>
-            </div>
-
         </div>
+
+        <div class="panel">
+            <div class="panel-top">
+                <span>🛡️ STATUS</span>
+                <span>☰</span>
+            </div>
+            <div class="date-display" id="clock">Sun Jan 14 2026</div>
+            <div class="mood-display">Mood: <span style="color:var(--gold)">Orange Flow</span></div>
+            
+            <div class="btn-grid">
+                <button class="stat-btn active" onclick="toggle(this)">Active</button>
+                <button class="stat-btn" onclick="toggle(this)">Idle</button>
+                <button class="stat-btn" onclick="toggle(this)">Paused</button>
+            </div>
+            <div class="btn-grid">
+                <button class="stat-btn" onclick="toggle(this)">Rain</button>
+                <button class="stat-btn active" onclick="toggle(this)">Sun</button>
+                <button class="stat-btn" onclick="toggle(this)">Grey</button>
+            </div>
+            <div class="btn-grid">
+                <button class="stat-btn" onclick="toggle(this)">Steady</button>
+                <button class="stat-btn active" onclick="toggle(this)">Flowing</button>
+                <button class="stat-btn" onclick="toggle(this)">Low</button>
+            </div>
+
+            <div class="footer">
+                <button class="save-btn" onclick="saveArchive()">Save Day</button>
+                <div class="chick" onclick="petChick()">🐥</div>
+            </div>
+        </div>
+
     </div>
+</div>
 
-    <script>
-        // Real-time Date Utility
-        function updateTime() {
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('en-US', { 
-                weekday: 'short', month: 'short', day: '2-digit', year: 'numeric' 
-            }).replace(/,/g, '');
-            document.getElementById('real-date').innerText = dateStr;
+<script>
+    // 1. CLOCK LOGIC
+    function updateClock() {
+        const now = new Date();
+        const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        document.getElementById('clock').innerText = 
+            `${days[now.getDay()]} ${months[now.getMonth()]} ${String(now.getDate()).padStart(2,'0')} 2026`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // 2. TOGGLE SYSTEM
+    function toggle(btn) {
+        const group = btn.parentElement.querySelectorAll('.stat-btn');
+        group.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    // 3. BACKPACK LOGIC (FUNCTIONAL UTILITY)
+    function switchView(view) {
+        const bp = document.getElementById('backpack-zone');
+        const navs = document.querySelectorAll('.nav-btn');
+        navs.forEach(n => n.classList.remove('active'));
+        
+        if(view === 'backpack') {
+            bp.classList.add('active-view');
+            document.getElementById('backpack-trigger').classList.add('active');
+        } else {
+            bp.classList.remove('active-view');
         }
-        setInterval(updateTime, 1000);
-        updateTime();
+    }
 
-        // Functional Utility: Button Toggles
-        document.querySelectorAll('.toggle-btn').forEach(btn => {
-            btn.onclick = function() {
-                // Find all buttons in the same 3-column row logic
-                // For simplicity, this just toggles them within the grid
-                const siblings = this.parentElement.querySelectorAll('.toggle-btn');
-                // Simple logic: buttons 0-2, 3-5, 6-8 are groups
-                const index = Array.from(siblings).indexOf(this);
-                const groupStart = Math.floor(index / 3) * 3;
-                for(let i = groupStart; i < groupStart + 3; i++) {
-                    siblings[i].classList.remove('active');
-                }
-                this.classList.add('active');
-            };
-        });
-
-        // The "Hike" Log Functionality
-        function saveArchive() {
-            const mood = document.getElementById('mood-text').innerText;
-            const logEntry = `Entry: ${new Date().toLocaleString()} | Domain: ${mood}`;
-            localStorage.setItem('archive_ages_log', logEntry);
-            alert("Hike Logged to the Archive of Ages.");
+    const taskInput = document.getElementById('taskInput');
+    taskInput.addEventListener('keypress', (e) => {
+        if(e.key === 'Enter' && taskInput.value !== '') {
+            const li = document.createElement('li');
+            li.innerHTML = `💠 ${taskInput.value}`;
+            li.style.marginTop = "5px";
+            document.getElementById('itemList').appendChild(li);
+            taskInput.value = '';
         }
-    </script>
+    });
+
+    // 4. SAVE TO AGES (AI PERSISTENCE)
+    function saveArchive() {
+        const data = {
+            time: document.getElementById('clock').innerText,
+            tasks: document.getElementById('itemList').innerText
+        };
+        localStorage.setItem('CrystalDomain_Save', JSON.stringify(data));
+        
+        const btn = document.querySelector('.save-btn');
+        btn.innerText = "SAVED TO ARCHIVE";
+        btn.style.background = "#ffd700";
+        setTimeout(() => { 
+            btn.innerText = "Save Day"; 
+            btn.style.background = "#cedef0";
+        }, 2000);
+    }
+
+    function petChick() {
+        alert("The chick chirps happily! Your essence increases.");
+    }
+</script>
+
 </body>
 </html>
