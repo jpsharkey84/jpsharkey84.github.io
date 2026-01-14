@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Crystal Domain | Archive of Ages</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        :root {
+            --panel-blue: rgba(74, 103, 153, 0.85);
+            --border-light: #9ab4d8;
+            --text-white: #e0eaf5;
+            --font-pixel: 'Press Start 2P', cursive;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            width: 100vw; height: 100vh;
+            overflow: hidden;
+            background-color: #000;
+            font-family: 'Courier New', Courier, monospace; /* Main text */
+        }
+
+        /* THE WORLD */
+        .world-container {
+            position: relative;
+            width: 100%; height: 100%;
+            background: url('background.png') no-repeat center center;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        /* ADDING DIMENSION: Moving Clouds Overlay */
+        .world-container::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 200%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/clouds.png');
+            opacity: 0.1;
+            animation: drift 60s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes drift {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+
+        /* THE UI OVERLAY - Positioned exactly like the image */
+        .interface {
+            position: absolute;
+            bottom: 40px;
+            width: 90%;
+            max-width: 1000px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            z-index: 10;
+        }
+
+        /* PANEL STYLING */
+        .panel {
+            background: var(--panel-blue);
+            border: 4px solid var(--border-light);
+            border-radius: 12px;
+            width: 320px;
+            padding: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border-light);
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+            font-family: var(--font-pixel);
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        /* LEFT PANEL: NAVIGATION & UTILITY */
+        .nav-list { display: flex; flex-direction: column; gap: 6px; }
+        .nav-item {
+            background: rgba(255,255,255,0.15);
+            border: 2px solid var(--border-light);
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: white;
+            text-transform: uppercase;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: left;
+        }
+        .nav-item.active { background: #cedef0; color: #4a6799; }
+        .nav-item:hover { background: rgba(255,255,255,0.3); }
+
+        /* RIGHT PANEL: STATUS & LOGGING */
+        .date-row { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
+        .mood-row { font-size: 13px; opacity: 0.9; margin-bottom: 15px; font-style: italic; }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .toggle-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--border-light);
+            color: white;
+            padding: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .toggle-btn.active { background: #fff; color: #4a6799; border-color: #fff; }
+
+        .save-day-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .save-btn {
+            background: #cedef0;
+            border: none;
+            padding: 8px 25px;
+            border-radius: 6px;
+            font-weight: bold;
+            color: #4a6799;
+            cursor: pointer;
+        }
+
+        .chick { font-size: 24px; animation: bounce 0.8s infinite alternate; }
+        @keyframes bounce { to { transform: translateY(-5px); } }
+
+    </style>
+</head>
+<body>
+
+    <div class="world-container">
+        <div class="interface">
+            
+            <div class="panel">
+                <div class="panel-header">
+                    <span>⚔️</span>
+                    <span>BEACONS</span>
+                    <span>📑</span>
+                </div>
+                <div class="nav-list">
+                    <div class="nav-item">Today</div>
+                    <div class="nav-item">Logs</div>
+                    <div class="nav-item active">Logs</div>
+                    <div class="nav-item">Backpack</div>
+                    <div class="nav-item">Flow</div>
+                    <div class="nav-item">Money</div>
+                </div>
+                <div style="text-align: right; margin-top: 10px;">
+                    <img src="https://cur.cursors-4u.net/arrow/arr-2/arr143.png" width="20">
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <span>🛡️</span>
+                    <span>DOMAIN STATUS</span>
+                    <span>📑</span>
+                </div>
+                <div class="date-row" id="real-date">Sun Jan 14 2026</div>
+                <div class="mood-row">Mood: <span id="mood-text">Orange Flow</span></div>
+                
+                <div class="button-grid">
+                    <button class="toggle-btn active">Active</button>
+                    <button class="toggle-btn">Idle</button>
+                    <button class="toggle-btn">Paused</button>
+                    
+                    <button class="toggle-btn">Rain</button>
+                    <button class="toggle-btn active">Sun</button>
+                    <button class="toggle-btn">Grey</button>
+                    
+                    <button class="toggle-btn">Steady</button>
+                    <button class="toggle-btn active">Flowing</button>
+                    <button class="toggle-btn">Low</button>
+                </div>
+
+                <div class="save-day-container">
+                    <button class="save-btn" onclick="saveArchive()">Save Day</button>
+                    <div class="chick">🐥</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Real-time Date Utility
+        function updateTime() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-US', { 
+                weekday: 'short', month: 'short', day: '2-digit', year: 'numeric' 
+            }).replace(/,/g, '');
+            document.getElementById('real-date').innerText = dateStr;
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // Functional Utility: Button Toggles
+        document.querySelectorAll('.toggle-btn').forEach(btn => {
+            btn.onclick = function() {
+                // Find all buttons in the same 3-column row logic
+                // For simplicity, this just toggles them within the grid
+                const siblings = this.parentElement.querySelectorAll('.toggle-btn');
+                // Simple logic: buttons 0-2, 3-5, 6-8 are groups
+                const index = Array.from(siblings).indexOf(this);
+                const groupStart = Math.floor(index / 3) * 3;
+                for(let i = groupStart; i < groupStart + 3; i++) {
+                    siblings[i].classList.remove('active');
+                }
+                this.classList.add('active');
+            };
+        });
+
+        // The "Hike" Log Functionality
+        function saveArchive() {
+            const mood = document.getElementById('mood-text').innerText;
+            const logEntry = `Entry: ${new Date().toLocaleString()} | Domain: ${mood}`;
+            localStorage.setItem('archive_ages_log', logEntry);
+            alert("Hike Logged to the Archive of Ages.");
+        }
+    </script>
+</body>
+</html>
