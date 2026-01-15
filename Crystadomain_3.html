@@ -2,222 +2,184 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Crystal Domain OS</title>
+    <title>Beacons - Enterable Environment</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
-
-        :root {
-            --panel-blue: rgba(74, 103, 153, 0.9);
-            --border-light: #9ab4d8;
-            --text-white: #e0eaf5;
-            --highlight: #cedef0;
-            --gold: #ffd700;
+        body { margin: 0; overflow: hidden; background: #203c56; font-family: 'Press Start 2P', cursive; }
+        canvas { display: block; image-rendering: pixelated; }
+        
+        /* UI Overlay */
+        #ui-layer {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            pointer-events: auto;
         }
-
-        * { box-sizing: border-box; cursor: crosshair; }
-        body, html { margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; font-family: 'VT323', monospace; background: #000; }
-
-        /* THE EXACT BACKGROUND */
-        .desktop {
-            position: relative; width: 100%; height: 100%;
-            background: url('https://i.imgur.com/n6L98jJ.png') no-repeat center center;
-            background-size: cover;
-            display: flex; justify-content: center; align-items: flex-end;
+        .panel {
+            background: rgba(74, 111, 165, 0.9);
+            border: 4px solid #94b0da;
+            padding: 15px;
+            color: white;
+            min-width: 200px;
         }
-
-        /* UI OVERLAY */
-        .ui-container {
-            position: relative; width: 100%; max-width: 1000px;
-            display: grid; grid-template-columns: 1fr 1fr; gap: 50px;
-            padding: 0 40px 60px 40px; z-index: 10;
-        }
-
-        .window {
-            background: var(--panel-blue); border: 4px solid var(--border-light);
-            border-radius: 8px; padding: 15px; box-shadow: 0 10px 0 rgba(0,0,0,0.4);
-        }
-
-        .window-header {
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 2px solid var(--border-light); padding-bottom: 8px; margin-bottom: 15px;
-            font-size: 24px; color: var(--highlight); letter-spacing: 2px;
-        }
-
-        /* LEFT PANEL: FUNCTIONAL TABS */
-        .content-area { height: 210px; overflow-y: auto; margin-bottom: 12px; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-
-        .nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-        .nav-btn {
-            background: rgba(0,0,0,0.3); border: 2px solid var(--border-light);
-            color: white; padding: 6px; font-family: 'VT323'; font-size: 20px; text-transform: uppercase;
-        }
-        .nav-btn.active { background: var(--highlight); color: var(--panel-blue); }
-
-        /* LIST UTILITY */
-        .todo-item { display: flex; align-items: center; gap: 10px; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        input[type="text"], input[type="number"] {
-            width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border-light);
-            color: white; font-family: 'VT323'; font-size: 20px; padding: 4px; outline: none;
-        }
-
-        /* RIGHT PANEL: STATUS CONTROLS */
-        .date-display { font-size: 34px; color: white; margin-bottom: 2px; }
-        .mood-display { font-size: 20px; color: var(--gold); margin-bottom: 15px; }
-
-        .control-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
-        .toggle {
-            background: rgba(0,0,0,0.2); border: 1px solid var(--border-light);
-            color: white; padding: 6px; font-size: 18px; text-align: center;
-        }
-        .toggle.on { background: white; color: var(--panel-blue); border-color: white; }
-
-        .footer { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
-        .save-btn {
-            background: var(--highlight); color: var(--panel-blue); border: none;
-            padding: 8px 30px; font-family: 'VT323'; font-size: 22px; border-radius: 4px;
-        }
-        .sprite { font-size: 38px; animation: bounce 0.8s infinite alternate; }
-        @keyframes bounce { from { transform: scale(1); } to { transform: scale(1.1) translateY(-5px); } }
+        .menu-item { font-size: 10px; padding: 5px; border: 1px solid transparent; margin-bottom: 5px; cursor: pointer; }
+        .menu-item:hover { border: 1px solid #fff; background: rgba(255,255,255,0.1); }
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-top: 10px; }
+        button { font-family: 'Press Start 2P'; font-size: 8px; background: #333; color: white; border: 1px solid #94b0da; padding: 5px; cursor: pointer; }
+        .controls-hint { position: absolute; top: 10px; left: 10px; color: gold; font-size: 8px; }
     </style>
 </head>
 <body>
 
-<div class="desktop">
-    <div class="ui-container">
-        
-        <div class="window">
-            <div class="window-header"><span>⚔️ BEACONS</span><span>📑</span></div>
-            
-            <div class="content-area">
-                <div id="backpack" class="tab-content active">
-                    <input type="text" id="add-task" placeholder="+ NEW OBJECTIVE">
-                    <div id="task-list" style="margin-top:10px;"></div>
-                </div>
-                <div id="money" class="tab-content">
-                    <div style="font-size:30px; color:var(--gold); text-align:center;">CURRENT BALANCE</div>
-                    <div id="balance" style="font-size:50px; text-align:center;">0 GP</div>
-                    <input type="number" id="add-gold" placeholder="+ ADD AMOUNT">
-                </div>
-                <div id="logs" class="tab-content">
-                    <div id="history-list" style="font-size:18px;"></div>
-                </div>
-            </div>
+<div class="controls-hint">USE WASD OR ARROWS TO WALK</div>
 
-            <div class="nav-grid">
-                <button class="nav-btn" onclick="openTab('today')">Today</button>
-                <button class="nav-btn" onclick="openTab('logs')">Logs</button>
-                <button class="nav-btn active" onclick="openTab('backpack')">Backpack</button>
-                <button class="nav-btn" onclick="openTab('money')">Money</button>
-            </div>
+<div id="ui-layer">
+    <div class="panel">
+        <div style="font-size: 12px; margin-bottom: 10px; border-bottom: 1px solid #fff;">BEACONS</div>
+        <div class="menu-item">TODAY</div>
+        <div class="menu-item">LOGS</div>
+        <div class="menu-item">BACKPACK</div>
+        <div class="menu-item">MONEY</div>
+    </div>
+    <div class="panel">
+        <div id="date" style="font-size: 10px; text-align: center;">Jan 14 2026</div>
+        <div class="btn-grid">
+            <button>Sun</button><button>Rain</button><button>Grey</button>
+            <button>Flow</button><button>Idle</button><button>Save</button>
         </div>
-
-        <div class="window">
-            <div class="window-header"><span>🛡️ STATUS</span><span>📑</span></div>
-            <div class="date-display" id="clock">Sun Jan 14 2026</div>
-            <div class="mood-display">Mood: <span id="mood-text">Orange Flow</span></div>
-            
-            <div class="control-row">
-                <div class="toggle on" onclick="t(this)">Active</div>
-                <div class="toggle" onclick="t(this)">Idle</div>
-                <div class="toggle" onclick="t(this)">Paused</div>
-            </div>
-            <div class="control-row">
-                <div class="toggle" onclick="t(this)">Rain</div>
-                <div class="toggle on" onclick="t(this)">Sun</div>
-                <div class="toggle" onclick="t(this)">Grey</div>
-            </div>
-            <div class="control-row">
-                <div class="toggle" onclick="t(this)">Steady</div>
-                <div class="toggle on" onclick="t(this)">Flowing</div>
-                <div class="toggle" onclick="t(this)">Low</div>
-            </div>
-
-            <div class="footer">
-                <button class="save-btn" onclick="saveSession()">SAVE DAY</button>
-                <div class="sprite">🐥</div>
-            </div>
-        </div>
-
     </div>
 </div>
 
+<canvas id="gameCanvas"></canvas>
+
 <script>
-    // --- REAL UTILITY LOGIC ---
-    let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    let gold = localStorage.getItem('gold') || 0;
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
 
-    // 1. Tab Switching
-    function openTab(name) {
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(name).classList.add('active');
-        event.currentTarget.classList.add('active');
-    }
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
-    // 2. Task Management
-    const taskInput = document.getElementById('add-task');
-    taskInput.addEventListener('keypress', e => {
-        if(e.key === 'Enter' && taskInput.value) {
-            tasks.push(taskInput.value);
-            localStorage.setItem('tasks', JSON.stringify(tasks));
-            taskInput.value = '';
-            renderTasks();
-        }
+// --- Game Objects ---
+
+const player = {
+    x: canvas.width / 2,
+    y: canvas.height * 0.7,
+    width: 32,
+    height: 48,
+    speed: 4,
+    color: '#4e342e', // Cloak color
+    targetX: canvas.width / 2,
+    targetY: canvas.height * 0.7
+};
+
+// Spires as Objects
+const spires = [
+    { x: canvas.width * 0.2, y: canvas.height * 0.3, scale: 1.2 },
+    { x: canvas.width * 0.8, y: canvas.height * 0.3, scale: 1.2 },
+    { x: canvas.width * 0.4, y: canvas.height * 0.4, scale: 0.8 },
+    { x: canvas.width * 0.6, y: canvas.height * 0.4, scale: 0.8 }
+];
+
+// Clouds for Parallax
+const clouds = [];
+for(let i = 0; i < 20; i++) {
+    clouds.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        size: Math.random() * 100 + 50,
+        speed: Math.random() * 0.5 + 0.1
     });
+}
 
-    function renderTasks() {
-        const list = document.getElementById('task-list');
-        list.innerHTML = tasks.map((t, i) => `
-            <div class="todo-item">
-                <span onclick="delTask(${i})" style="color:red; cursor:pointer;">[X]</span>
-                <span>${t}</span>
-            </div>
-        `).join('');
-    }
+// --- Input Handling ---
+const keys = {};
+window.addEventListener('keydown', e => keys[e.code] = true);
+window.addEventListener('keyup', e => keys[e.code] = false);
 
-    function delTask(i) {
-        tasks.splice(i, 1);
-        localStorage.setItem('tasks', JSON.stringify(tasks));
-        renderTasks();
-    }
+// --- Render Functions ---
 
-    // 3. Money Utility
-    const goldInput = document.getElementById('add-gold');
-    goldInput.addEventListener('keypress', e => {
-        if(e.key === 'Enter' && goldInput.value) {
-            gold = parseInt(gold) + parseInt(goldInput.value);
-            localStorage.setItem('gold', gold);
-            goldInput.value = '';
-            updateGold();
-        }
+function drawSky() {
+    let gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, '#ff9d00'); // Top (Sun)
+    gradient.addColorStop(0.5, '#feb47b'); // Horizon
+    gradient.addColorStop(1, '#203c56'); // Bottom
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+function drawClouds() {
+    ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+    clouds.forEach(c => {
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, c.size, 0, Math.PI * 2);
+        ctx.fill();
+        // Move clouds slightly for ambient life
+        c.x += c.speed;
+        if (c.x > canvas.width + 100) c.x = -100;
     });
+}
 
-    function updateGold() { document.getElementById('balance').innerText = gold + " GP"; }
+function drawPath() {
+    ctx.fillStyle = "rgba(255, 255, 255, 0.15)";
+    ctx.beginPath();
+    ctx.moveTo(canvas.width / 2 - 50, canvas.height);
+    ctx.lineTo(canvas.width / 2 - 10, canvas.height * 0.3);
+    ctx.lineTo(canvas.width / 2 + 10, canvas.height * 0.3);
+    ctx.lineTo(canvas.width / 2 + 50, canvas.height);
+    ctx.fill();
+}
 
-    // 4. Status Toggles
-    function t(el) {
-        el.parentElement.querySelectorAll('.toggle').forEach(b => b.classList.remove('on'));
-        el.classList.add('on');
-    }
+function drawSpires() {
+    spires.forEach(s => {
+        ctx.fillStyle = "#94b0da";
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = "gold";
+        // Simple pixel-style Obelisk
+        ctx.fillRect(s.x, s.y, 40 * s.scale, 200 * s.scale);
+        ctx.beginPath();
+        ctx.moveTo(s.x, s.y);
+        ctx.lineTo(s.x + (20 * s.scale), s.y - (40 * s.scale));
+        ctx.lineTo(s.x + (40 * s.scale), s.y);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+    });
+}
 
-    // 5. Save & Clock
-    function saveSession() {
-        alert("SESSION DATA ARCHIVED TO LOCALSTORAGE");
-    }
+function drawPlayer() {
+    // Shadow
+    ctx.fillStyle = "rgba(0,0,0,0.3)";
+    ctx.beginPath();
+    ctx.ellipse(player.x + 16, player.y + 45, 15, 8, 0, 0, Math.PI * 2);
+    ctx.fill();
 
-    function updateTime() {
-        const now = new Date();
-        document.getElementById('clock').innerText = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: '2-digit', year: 'numeric' });
-    }
+    // Cloaked figure sprite
+    ctx.fillStyle = player.color;
+    ctx.fillRect(player.x, player.y, 32, 48); // Body
+    ctx.fillStyle = "#222"; 
+    ctx.fillRect(player.x + 8, player.y + 5, 16, 10); // Hood shadow
+}
 
-    // Initialize
-    setInterval(updateTime, 1000);
-    updateTime();
-    renderTasks();
-    updateGold();
+function update() {
+    if (keys['KeyW'] || keys['ArrowUp']) player.y -= player.speed;
+    if (keys['KeyS'] || keys['ArrowDown']) player.y += player.speed;
+    if (keys['KeyA'] || keys['ArrowLeft']) player.x -= player.speed;
+    if (keys['KeyD'] || keys['ArrowRight']) player.x += player.speed;
+}
+
+function gameLoop() {
+    update();
+    drawSky();
+    drawClouds();
+    drawPath();
+    drawSpires();
+    drawPlayer();
+    requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
 </script>
-
 </body>
 </html>
