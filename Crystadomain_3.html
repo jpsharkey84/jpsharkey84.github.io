@@ -2,171 +2,141 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crystal Domain OS</title>
     <style>
-        /* PIXEL ART FONT */
         @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 
         :root {
-            --ui-blue: #4a6799;
-            --ui-bg: rgba(74, 103, 153, 0.9);
-            --ui-border: #9ab4d8;
+            --panel-blue: rgba(74, 103, 153, 0.9);
+            --border-light: #9ab4d8;
+            --text-white: #e0eaf5;
             --highlight: #cedef0;
             --gold: #ffd700;
         }
 
-        body, html {
-            margin: 0; padding: 0;
-            width: 100vw; height: 100vh;
-            overflow: hidden;
-            font-family: 'VT323', monospace;
-            background: #000;
-        }
+        * { box-sizing: border-box; cursor: crosshair; }
+        body, html { margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; font-family: 'VT323', monospace; background: #000; }
 
-        /* LIVING BACKGROUND */
-        .world {
-            position: relative;
-            width: 100%; height: 100%;
+        /* THE EXACT BACKGROUND */
+        .desktop {
+            position: relative; width: 100%; height: 100%;
             background: url('https://i.imgur.com/n6L98jJ.png') no-repeat center center;
             background-size: cover;
             display: flex; justify-content: center; align-items: flex-end;
         }
 
-        /* CLOUD DRIFT EFFECT */
-        .clouds {
-            position: absolute; inset: 0;
-            background: url('https://www.transparenttextures.com/patterns/clouds.png');
-            opacity: 0.2; pointer-events: none;
-            animation: drift 100s linear infinite;
+        /* UI OVERLAY */
+        .ui-container {
+            position: relative; width: 100%; max-width: 1000px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 50px;
+            padding: 0 40px 60px 40px; z-index: 10;
         }
 
-        /* BLIMP ANIMATION */
-        .blimp-layer {
-            position: absolute; top: 10%; right: 15%;
-            width: 200px; height: 100px;
-            background: url('https://i.imgur.com/your-blimp-cutout.png') no-repeat; /* Optional asset */
-            animation: bob 4s ease-in-out infinite;
+        .window {
+            background: var(--panel-blue); border: 4px solid var(--border-light);
+            border-radius: 8px; padding: 15px; box-shadow: 0 10px 0 rgba(0,0,0,0.4);
         }
 
-        @keyframes drift { from { background-position: 0 0; } to { background-position: 10000px 0; } }
-        @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
-
-        /* THE UI INTERFACE */
-        .interface {
-            position: relative; width: 100%; max-width: 900px;
-            display: flex; justify-content: space-between;
-            padding: 0 40px 60px 40px;
-            z-index: 10;
-        }
-
-        .panel {
-            background: var(--ui-bg);
-            border: 4px solid var(--ui-border);
-            border-radius: 8px;
-            padding: 12px;
-            width: 380px;
-            box-shadow: 0 10px 0 rgba(0,0,0,0.3);
-        }
-
-        .panel-top {
+        .window-header {
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 2px solid var(--ui-border);
-            padding-bottom: 6px; margin-bottom: 12px;
-            font-size: 24px; color: var(--highlight);
+            border-bottom: 2px solid var(--border-light); padding-bottom: 8px; margin-bottom: 15px;
+            font-size: 24px; color: var(--highlight); letter-spacing: 2px;
         }
 
-        /* LEFT PANEL: NAVIGATION */
-        .nav-list { display: flex; flex-direction: column; gap: 8px; }
+        /* LEFT PANEL: FUNCTIONAL TABS */
+        .content-area { height: 210px; overflow-y: auto; margin-bottom: 12px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
         .nav-btn {
-            background: rgba(0,0,0,0.2);
-            border: 2px solid var(--ui-border);
-            color: white; padding: 10px;
-            text-align: left; font-size: 22px; cursor: pointer;
-            text-transform: uppercase;
+            background: rgba(0,0,0,0.3); border: 2px solid var(--border-light);
+            color: white; padding: 6px; font-family: 'VT323'; font-size: 20px; text-transform: uppercase;
         }
-        .nav-btn:hover, .nav-btn.active { background: var(--highlight); color: var(--ui-blue); }
+        .nav-btn.active { background: var(--highlight); color: var(--panel-blue); }
 
-        /* RIGHT PANEL: STATUS */
-        .date-display { font-size: 32px; color: white; margin-bottom: 4px; }
+        /* LIST UTILITY */
+        .todo-item { display: flex; align-items: center; gap: 10px; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        input[type="text"], input[type="number"] {
+            width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border-light);
+            color: white; font-family: 'VT323'; font-size: 20px; padding: 4px; outline: none;
+        }
+
+        /* RIGHT PANEL: STATUS CONTROLS */
+        .date-display { font-size: 34px; color: white; margin-bottom: 2px; }
         .mood-display { font-size: 20px; color: var(--gold); margin-bottom: 15px; }
 
-        .btn-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 15px; }
-        .stat-btn {
-            background: rgba(0,0,0,0.2); border: 2px solid var(--ui-border);
-            color: white; padding: 6px; font-size: 18px; cursor: pointer;
+        .control-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+        .toggle {
+            background: rgba(0,0,0,0.2); border: 1px solid var(--border-light);
+            color: white; padding: 6px; font-size: 18px; text-align: center;
         }
-        .stat-btn.active { background: white; color: var(--ui-blue); }
+        .toggle.on { background: white; color: var(--panel-blue); border-color: white; }
 
-        .footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+        .footer { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
         .save-btn {
-            background: var(--highlight); border: none; padding: 10px 30px;
-            font-family: 'VT323'; font-size: 22px; cursor: pointer; border-radius: 4px;
+            background: var(--highlight); color: var(--panel-blue); border: none;
+            padding: 8px 30px; font-family: 'VT323'; font-size: 22px; border-radius: 4px;
         }
-        .chick { font-size: 40px; animation: bounce 0.6s infinite alternate; cursor: pointer; }
+        .sprite { font-size: 38px; animation: bounce 0.8s infinite alternate; }
         @keyframes bounce { from { transform: scale(1); } to { transform: scale(1.1) translateY(-5px); } }
-
-        /* CONTENT OVERLAYS */
-        .backpack-content { display: none; margin-top: 10px; }
-        .active-view { display: block; }
-
     </style>
 </head>
 <body>
 
-<div class="world">
-    <div class="clouds"></div>
-    <div class="blimp-layer"></div>
-
-    <div class="interface">
+<div class="desktop">
+    <div class="ui-container">
         
-        <div class="panel">
-            <div class="panel-top">
-                <span>⚔️ BEACONS</span>
-                <span>☰</span>
-            </div>
-            <div class="nav-list" id="nav-list">
-                <button class="nav-btn" onclick="switchView('today')">TODAY</button>
-                <button class="nav-btn" onclick="switchView('logs')">LOGS</button>
-                <button class="nav-btn active" id="backpack-trigger" onclick="switchView('backpack')">BACKPACK</button>
-                <button class="nav-btn">FLOW</button>
-                <button class="nav-btn">MONEY</button>
-            </div>
+        <div class="window">
+            <div class="window-header"><span>⚔️ BEACONS</span><span>📑</span></div>
             
-            <div id="backpack-zone" class="backpack-content">
-                <input type="text" id="taskInput" placeholder="+ ADD ITEM" 
-                       style="width:100%; background:transparent; border:1px solid #fff; color:#fff; font-family:'VT323'; font-size:20px; padding:5px;">
-                <ul id="itemList" style="list-style:none; padding:0; font-size:20px;"></ul>
+            <div class="content-area">
+                <div id="backpack" class="tab-content active">
+                    <input type="text" id="add-task" placeholder="+ NEW OBJECTIVE">
+                    <div id="task-list" style="margin-top:10px;"></div>
+                </div>
+                <div id="money" class="tab-content">
+                    <div style="font-size:30px; color:var(--gold); text-align:center;">CURRENT BALANCE</div>
+                    <div id="balance" style="font-size:50px; text-align:center;">0 GP</div>
+                    <input type="number" id="add-gold" placeholder="+ ADD AMOUNT">
+                </div>
+                <div id="logs" class="tab-content">
+                    <div id="history-list" style="font-size:18px;"></div>
+                </div>
+            </div>
+
+            <div class="nav-grid">
+                <button class="nav-btn" onclick="openTab('today')">Today</button>
+                <button class="nav-btn" onclick="openTab('logs')">Logs</button>
+                <button class="nav-btn active" onclick="openTab('backpack')">Backpack</button>
+                <button class="nav-btn" onclick="openTab('money')">Money</button>
             </div>
         </div>
 
-        <div class="panel">
-            <div class="panel-top">
-                <span>🛡️ STATUS</span>
-                <span>☰</span>
-            </div>
+        <div class="window">
+            <div class="window-header"><span>🛡️ STATUS</span><span>📑</span></div>
             <div class="date-display" id="clock">Sun Jan 14 2026</div>
-            <div class="mood-display">Mood: <span style="color:var(--gold)">Orange Flow</span></div>
+            <div class="mood-display">Mood: <span id="mood-text">Orange Flow</span></div>
             
-            <div class="btn-grid">
-                <button class="stat-btn active" onclick="toggle(this)">Active</button>
-                <button class="stat-btn" onclick="toggle(this)">Idle</button>
-                <button class="stat-btn" onclick="toggle(this)">Paused</button>
+            <div class="control-row">
+                <div class="toggle on" onclick="t(this)">Active</div>
+                <div class="toggle" onclick="t(this)">Idle</div>
+                <div class="toggle" onclick="t(this)">Paused</div>
             </div>
-            <div class="btn-grid">
-                <button class="stat-btn" onclick="toggle(this)">Rain</button>
-                <button class="stat-btn active" onclick="toggle(this)">Sun</button>
-                <button class="stat-btn" onclick="toggle(this)">Grey</button>
+            <div class="control-row">
+                <div class="toggle" onclick="t(this)">Rain</div>
+                <div class="toggle on" onclick="t(this)">Sun</div>
+                <div class="toggle" onclick="t(this)">Grey</div>
             </div>
-            <div class="btn-grid">
-                <button class="stat-btn" onclick="toggle(this)">Steady</button>
-                <button class="stat-btn active" onclick="toggle(this)">Flowing</button>
-                <button class="stat-btn" onclick="toggle(this)">Low</button>
+            <div class="control-row">
+                <div class="toggle" onclick="t(this)">Steady</div>
+                <div class="toggle on" onclick="t(this)">Flowing</div>
+                <div class="toggle" onclick="t(this)">Low</div>
             </div>
 
             <div class="footer">
-                <button class="save-btn" onclick="saveArchive()">Save Day</button>
-                <div class="chick" onclick="petChick()">🐥</div>
+                <button class="save-btn" onclick="saveSession()">SAVE DAY</button>
+                <div class="sprite">🐥</div>
             </div>
         </div>
 
@@ -174,69 +144,79 @@
 </div>
 
 <script>
-    // 1. CLOCK LOGIC
-    function updateClock() {
-        const now = new Date();
-        const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        document.getElementById('clock').innerText = 
-            `${days[now.getDay()]} ${months[now.getMonth()]} ${String(now.getDate()).padStart(2,'0')} 2026`;
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
+    // --- REAL UTILITY LOGIC ---
+    let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    let gold = localStorage.getItem('gold') || 0;
 
-    // 2. TOGGLE SYSTEM
-    function toggle(btn) {
-        const group = btn.parentElement.querySelectorAll('.stat-btn');
-        group.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+    // 1. Tab Switching
+    function openTab(name) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(name).classList.add('active');
+        event.currentTarget.classList.add('active');
     }
 
-    // 3. BACKPACK LOGIC (FUNCTIONAL UTILITY)
-    function switchView(view) {
-        const bp = document.getElementById('backpack-zone');
-        const navs = document.querySelectorAll('.nav-btn');
-        navs.forEach(n => n.classList.remove('active'));
-        
-        if(view === 'backpack') {
-            bp.classList.add('active-view');
-            document.getElementById('backpack-trigger').classList.add('active');
-        } else {
-            bp.classList.remove('active-view');
-        }
-    }
-
-    const taskInput = document.getElementById('taskInput');
-    taskInput.addEventListener('keypress', (e) => {
-        if(e.key === 'Enter' && taskInput.value !== '') {
-            const li = document.createElement('li');
-            li.innerHTML = `💠 ${taskInput.value}`;
-            li.style.marginTop = "5px";
-            document.getElementById('itemList').appendChild(li);
+    // 2. Task Management
+    const taskInput = document.getElementById('add-task');
+    taskInput.addEventListener('keypress', e => {
+        if(e.key === 'Enter' && taskInput.value) {
+            tasks.push(taskInput.value);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
             taskInput.value = '';
+            renderTasks();
         }
     });
 
-    // 4. SAVE TO AGES (AI PERSISTENCE)
-    function saveArchive() {
-        const data = {
-            time: document.getElementById('clock').innerText,
-            tasks: document.getElementById('itemList').innerText
-        };
-        localStorage.setItem('CrystalDomain_Save', JSON.stringify(data));
-        
-        const btn = document.querySelector('.save-btn');
-        btn.innerText = "SAVED TO ARCHIVE";
-        btn.style.background = "#ffd700";
-        setTimeout(() => { 
-            btn.innerText = "Save Day"; 
-            btn.style.background = "#cedef0";
-        }, 2000);
+    function renderTasks() {
+        const list = document.getElementById('task-list');
+        list.innerHTML = tasks.map((t, i) => `
+            <div class="todo-item">
+                <span onclick="delTask(${i})" style="color:red; cursor:pointer;">[X]</span>
+                <span>${t}</span>
+            </div>
+        `).join('');
     }
 
-    function petChick() {
-        alert("The chick chirps happily! Your essence increases.");
+    function delTask(i) {
+        tasks.splice(i, 1);
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+        renderTasks();
     }
+
+    // 3. Money Utility
+    const goldInput = document.getElementById('add-gold');
+    goldInput.addEventListener('keypress', e => {
+        if(e.key === 'Enter' && goldInput.value) {
+            gold = parseInt(gold) + parseInt(goldInput.value);
+            localStorage.setItem('gold', gold);
+            goldInput.value = '';
+            updateGold();
+        }
+    });
+
+    function updateGold() { document.getElementById('balance').innerText = gold + " GP"; }
+
+    // 4. Status Toggles
+    function t(el) {
+        el.parentElement.querySelectorAll('.toggle').forEach(b => b.classList.remove('on'));
+        el.classList.add('on');
+    }
+
+    // 5. Save & Clock
+    function saveSession() {
+        alert("SESSION DATA ARCHIVED TO LOCALSTORAGE");
+    }
+
+    function updateTime() {
+        const now = new Date();
+        document.getElementById('clock').innerText = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: '2-digit', year: 'numeric' });
+    }
+
+    // Initialize
+    setInterval(updateTime, 1000);
+    updateTime();
+    renderTasks();
+    updateGold();
 </script>
 
 </body>
