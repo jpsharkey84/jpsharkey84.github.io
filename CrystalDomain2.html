@@ -169,7 +169,7 @@
     </div>
 
     <nav class="hike-nav">
-        <div class="hike-label" id="ascent-status">HIKE TO THE ARCHIVE OF AGES</div>
+        <div class="hike-label" id="ascent-status">task progress</div>
         <div class="progress-track">
             <div id="hike-bar" class="progress-fill"></div>
         </div>
@@ -181,8 +181,8 @@
             <div id="dynamic-content" class="content-area">
                 </div>
             <div class="menu-list">
-                <button class="menu-btn" onclick="renderTab('backpack')">BACKPACK</button>
-                <button class="menu-btn" onclick="renderTab('logs')">ARCHIVE</button>
+                <button class="menu-btn" onclick="renderTab('backpack')">tasks</button>
+                <button class="menu-btn" onclick="renderTab('logs')">history</button>
             </div>
         </section>
 
@@ -211,51 +211,9 @@
 
             <div class="action-footer">
                 <button class="save-btn" onclick="saveToAges()">STAMP ARCHIVE</button>
-                <div class="pet-sprite">👽</div>
+                <div class="pet-sprite">🌐</div>
             </div>
 
-            #menu {
-  background:var(--panel-bg);
-  border-right:1px solid var(--panel-border);
-  padding:20px 14px;
-}
-.menu-title { font-size:14px; letter-spacing:2px; margin-bottom:20px; color:var(--text-dim);}
-.menu-item {
-  padding:10px 8px;
-  margin-bottom:6px;
-  cursor:pointer;
-  border-left:4px solid transparent;
-  transition:0.3s;
-}
-.menu-item.active{
-  border-left:4px solid white;
-  background:var(--highlight-color);
-}
-.menu-item:hover{ background:var(--highlight-color); }
-
-/* ----------------- MAIN AREA ----------------- */
-#main { 
-  padding:24px; 
-  display:flex; 
-  flex-direction:column; 
-  justify-content:flex-start;
-  overflow-y:auto;
-}
-#status { 
-  font-size:13px; color:var(--text-dim);
-}
-#beacon {
-  align-self:flex-end; 
-  height: 160px;
-  width:160px; 
-  border: 2px solid rgba(216, 136, 17, 0.01);
-  background:radial-gradient(circle at center,rgba(255,165,0,0.45),rgba(255,165,0,0.05));
-  box-shadow:0 0 20px rgba(255,165,0,0.3);
-  animation:breathe 6s ease-in-out infinite;
-  border-radius:25px;
-  margin-top:20px;
-}
-@keyframes breathe{0%,100%{opacity:0.85;}50%{opacity:1;}}
         </section>
     </main>
 
