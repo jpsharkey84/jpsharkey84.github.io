@@ -27,7 +27,7 @@
             position: fixed;
             width: 100%; height: 100%;
             z-index: -1;
-            background: url('https://i.imgur.com/VqNgnhu.jpeg') no-repeat center center; /* Replace with your actual image path */
+            background: url('https://i.imgur.com') no-repeat center center; /* Replace with your actual image path */
             background-size: cover;
         }
 
@@ -284,7 +284,7 @@
 
         function saveToAges() {
             const btn = document.querySelector('.save-btn');
-            const originalText = btn.innerText;archive day
+            const originalText = btn.innerText = "SAVE DAY";
             btn.innerText = "RECORDED FOR ETERNITY";
             
             // Add to history
