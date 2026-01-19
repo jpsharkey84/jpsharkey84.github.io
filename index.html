@@ -251,6 +251,7 @@ function renderToday(dateStr){
     STATE.stats.hours = parseInt(parts[0].split(':')[1])||0;
     STATE.stats.steps = parseInt(parts[1].split(':')[1])||0;
     STATE.stats.money = parseInt(parts[2].split(':')[1])||0;
+    STATE.stats.jobs  = parseInt(parts[3].split(':')[1])||0;
   };
   statsPanel.appendChild(statsBox);
   todayDiv.appendChild(statsPanel);
