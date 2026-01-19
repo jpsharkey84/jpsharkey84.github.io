@@ -144,12 +144,11 @@ button:hover{background:var(--highlight-color);}
 <div id="app">
   <!-- LEFT MENU -->
   <div id="menu">
-    <div class="menu-title">BEACONS</div>
+    <div class="menu-title">Menu</div>
     
     <div class="menu-item active" onclick="switchScreen('Calendar')">Calendar</div>
     <div class="menu-item" onclick="switchScreen('logs')">Logs</div>
     <div class="menu-item" onclick="switchScreen('backpack')">Backpack</div>
-    
     <div class="menu-item" onclick="switchScreen('Map')">Map</div>
   </div>
 
@@ -173,7 +172,7 @@ const OptionPool = {
   Jobs: ['Cleaning', 'Hauling', 'Assembly']
 };
 let STATE = {
-  mood:'Orange Flow', 
+  mood:'Code Flow', 
   moodColor:'rgba(255,165,0,0.18)',
   today:{ Work:'Active', Weather:'Sun', Money:'Steady' , Jobs:'Cleaning'},
   tasks:[],
