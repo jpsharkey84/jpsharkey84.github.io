@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crystal Domain | Archive of Ages</title>
+    <style>
+        /* --- CSS: THE VISUAL DIMENSION --- */
+        :root {
+            --crystal-blue: rgba(30, 50, 90, 0.85);
+            --border-blue: #9ab4d8;
+            --gold: #ffd700;
+            --text-main: #e0eaf5;
+            --font-pixel: 'Courier New', Courier, monospace;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            height: 100%; overflow: hidden;
+            background: #050a15;
+            font-family: var(--font-pixel);
+            color: var(--text-main);
+        }
+
+        /* Background Layer */
+        .background-container {
+            position: fixed;
+            width: 100%; height: 100%;
+            z-index: -1;
+            background: url('https://i.imgur.com') no-repeat center center; /* Replace with your actual image path */
+            background-size: cover;
+        }
+
+        .overlay-vignette {
+            position: absolute;
+            width: 100%; height: 100%;
+            background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.4) 100%);
+            pointer-events: none;
+        }
+
+        /* Hike Progress Bar */
+        .hike-nav {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50%;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .hike-label {
+            font-size: 0.8rem;
+            letter-spacing: 3px;
+            margin-bottom: 8px;
+            text-shadow: 0 0 10px var(--gold);
+        }
+
+        .progress-track {
+            height: 8px;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid var(--border-blue);
+            box-shadow: 0 0 15px rgba(154, 180, 216, 0.3);
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 10%;
+            background: linear-gradient(90deg, var(--gold), #fff);
+            box-shadow: 0 0 10px var(--gold);
+            transition: width 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* UI Panels */
+        .ui-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            height: 100vh;
+            padding: 50px;
+            box-sizing: border-box;
+        }
+
+        .panel {
+            background: var(--crystal-blue);
+            border: 3px solid var(--border-blue);
+            padding: 20px;
+            min-width: 300px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.7), inset 0 0 15px rgba(255,255,255,0.05);
+            backdrop-filter: blur(5px);
+        }
+
+        .panel-header {
+            text-align: center;
+            border-bottom: 1px solid var(--border-blue);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        /* Backpack & Tabs */
+        .content-area { height: 200px; overflow-y: auto; margin-bottom: 15px; }
+        
+        .pixel-list { list-style: none; padding: 0; }
+        .pixel-list li {
+            padding: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .menu-list { display: flex; gap: 10px; }
+        .menu-btn, .status-btn, .save-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-blue);
+            color: white;
+            padding: 8px;
+            cursor: pointer;
+            font-family: var(--font-pixel);
+            font-size: 0.7rem;
+            flex: 1;
+        }
+
+        .menu-btn:hover, .status-btn.active {
+            background: var(--text-main);
+            color: #1e325a;
+        }
+
+        /* Right Panel Details */
+        .date-display { font-size: 1.2rem; margin-bottom: 5px; }
+        .mood-tag { font-size: 0.8rem; color: var(--gold); margin-bottom: 20px; }
+
+        .control-grid { display: flex; flex-direction: column; gap: 15px; }
+        .btn-group { display: flex; gap: 5px; margin-top: 5px; }
+
+        .action-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 25px;
+        }
+
+        .save-btn {
+            background: rgba(255, 215, 0, 0.1);
+            border-color: var(--gold);
+            font-weight: bold;
+            flex: none;
+            width: 70%;
+        }
+
+        .pet-sprite { font-size: 2rem; animation: float 2s infinite ease-in-out; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Hide Scrollbar */
+        .content-area::-webkit-scrollbar { width: 4px; }
+        .content-area::-webkit-scrollbar-thumb { background: var(--gold); }
+    </style>
+</head>
+<body>
+
+    <div class="background-container">
+        <div class="overlay-vignette"></div>
+    </div>
+
+    <nav class="hike-nav">
+        <div class="hike-label" id="ascent-status">task progress</div>
+        <div class="progress-track">
+            <div id="hike-bar" class="progress-fill"></div>
+        </div>
+    </nav>
+
+    <main class="ui-wrapper">
+        <section class="panel">
+            <header class="panel-header">Task</header>
+            <div id="dynamic-content" class="content-area">
+                </div>
+            <div class="menu-list">
+                <button class="menu-btn" onclick="renderTab('backpack')">tasks</button>
+                <button class="menu-btn" onclick="renderTab('logs')">history</button>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="date-display" id="clock">Sun Jan 04 2026</div>
+            <div class="mood-tag">Domain: day state </div>
+            
+            <div class="control-grid">
+                <div>
+                    <span>FLOW STATE</span>
+                    <div class="btn-group">
+                        <button class="status-btn active" onclick="toggleBtn(this)">Steady</button>
+                        <button class="status-btn" onclick="toggleBtn(this)">Flowing</button>
+                        <button class="status-btn" onclick="toggleBtn(this)">Low</button>
+                    </div>
+                </div>
+                <div>
+                    <span>weather</span>
+                    <div class="btn-group">
+                        <button class="status-btn" onclick="toggleBtn(this)">Rain</button>
+                        <button class="status-btn active" onclick="toggleBtn(this)">Sun</button>
+                        <button class="status-btn" onclick="toggleBtn(this)">Grey</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-footer">
+                <button class="save-btn" onclick="saveToAges()">STAMP ARCHIVE</button>
+                <div class="pet-sprite">🌐</div>
+            </div>
+
+        </section>
+    </main>
+
+    <script>
+        /* --- JS: THE SOUL OF THE DOMAIN --- */
+
+        const state = {
+            tasks: [
+                { id: 1, text: "Gather data", done: false },
+                { id: 2, text: "Observe the Blimp ", done: true },
+                { id: 3, text: "Consult the oracle", done: false },
+                { id: 4, text: "Fuel the Beacon", done: false }
+            ],
+            history: ["Visited Jan 02: Clear skies.", "Visited Jan 03: Foggy Ascent."]
+        };
+
+        function updateClock() {
+            const now = new Date();
+            const options = { weekday: 'short', month: 'short', day: '2-digit', year: 'numeric' };
+            document.getElementById('clock').innerText = now.toLocaleDateString('en-US', options);
+        }
+
+        function renderTab(tab) {
+            const container = document.getElementById('dynamic-content');
+            if (tab === 'backpack') {
+                container.innerHTML = `<ul class="pixel-list">
+                    ${state.tasks.map(t => `
+                        <li>
+                            <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTask(${t.id})">
+                            <span style="${t.done ? 'text-decoration: line-through; opacity: 0.5' : ''}">${t.text}</span>
+                        </li>
+                    `).join('')}
+                </ul>`;
+            } else {
+                container.innerHTML = `<ul class="pixel-list">
+                    ${state.history.map(h => `<li>📜 ${h}</li>`).join('')}
+                </ul>`;
+            }
+            updateProgress();
+        }
+
+        function toggleTask(id) {
+            const task = state.tasks.find(t => t.id === id);
+            task.done = !task.done;
+            renderTab('backpack');
+        }
+
+        function updateProgress() {
+            const total = state.tasks.length;
+            const done = state.tasks.filter(t => t.done).length;
+            const percent = (done / total) * 100;
+            document.getElementById('hike-bar').style.width = percent + "%";
+            
+            if (percent === 100) {
+                document.getElementById('ascent-status').innerText = "GOAL REACHED";
+                document.getElementById('ascent-status').style.color = "var(--gold)";
+            } else {
+                document.getElementById('ascent-status').innerText = "DAILY PROGRESS";
+                document.getElementById('ascent-status').style.color = "var(--text-main)";
+            }
+        }
+
+        function toggleBtn(btn) {
+            const group = btn.parentElement.querySelectorAll('.status-btn');
+            group.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        function saveToAges() {
+            const btn = document.querySelector('.save-btn');
+            const originalText = btn.innerText = "SAVE DAY";
+            btn.innerText = "RECORDED FOR ETERNITY";
+            
+            // Add to history
+            const now = new Date().toLocaleDateString();
+            state.history.unshift(`Stamped ${now}: Completed ${state.tasks.filter(t=>t.done).length} tasks.`);
+            
+            setTimeout(() => { btn.innerText = originalText; }, 2000);
+        }
+
+        // Initialize
+        setInterval(updateClock, 1000);
+        updateClock();
+        renderTab('backpack');
+    </script>
+</body>
+</html>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OG Status Board</title>
+    <style>
+        :root {
+            --og-blue: linear-gradient(180deg, #0000ad 0%, #00004a 100%);
+            --og-border: #ffffff;
+            --og-yellow: #ffff00;
+            --og-green: #00ff00;
+            --materia-magic: #00ff44;
+            --materia-command: #ffff00;
+            --materia-summon: #ff0000;
+        }
+
+        body {
+            margin: 0; padding: 0; background: #000;
+            font-family: 'Courier New', Courier, monospace;
+            color: white; overflow: hidden; height: 100vh;
+            display: flex; justify-content: center;
+        }
+
+        /* 1. THE MOVING FLOOR */
+        .glassway {
+            position: fixed; bottom: 0; width: 200%; height: 50%;
+            background-image: linear-gradient(rgba(0, 255, 255, 0.15) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0, 255, 255, 0.15) 1px, transparent 1px);
+            background-size: 50px 50px;
+            transform: perspective(400px) rotateX(60deg) translateX(-25%);
+            animation: walk 10s linear infinite;
+            z-index: -1;
+        }
+        @keyframes walk { 100% { background-position: 0 50px; } }
+
+        /* 2. THE MAIN BOARD */
+        .ff-window {
+            width: 92%; max-width: 420px; margin-top: 15px; height: 92vh;
+            background: var(--og-blue);
+            border: 3px double var(--og-border);
+            border-radius: 8px; display: flex; flex-direction: column;
+            padding: 15px; box-shadow: 0 0 25px rgba(0,0,0,1);
+            animation: breathe 5s ease-in-out infinite;
+        }
+        @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.005); } }
+
+        /* 3. CURSOR FINGER */
+        .cursor-finger {
+            position: absolute; left: -32px; top: 18px;
+            font-size: 1.8rem; animation: finger-point 0.6s infinite alternate;
+            display: none; pointer-events: none; z-index: 10;
+        }
+        @keyframes finger-point { from { transform: translateX(0); } to { transform: translateX(-8px); } }
+
+        /* 4. TILES & INPUTS */
+        .tile {
+            background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2);
+            padding: 12px; margin-bottom: 10px; position: relative;
+            box-shadow: inset 2px 2px 0 rgba(255,255,255,0.2);
+        }
+        .tile:focus-within .cursor-finger { display: block; }
+        
+        .label { color: var(--og-yellow); font-size: 0.75rem; display: block; margin-bottom: 4px; }
+        
+        input, select {
+            background: transparent; border: none; color: #fff;
+            width: 100%; font-family: inherit; font-size: 1.1rem; outline: none;
+            text-transform: uppercase;
+        }
+        input:focus { color: var(--og-green); }
+
+        /* 5. MATERIA SYSTEM */
+        .materia-row { display: flex; gap: 12px; margin-top: 10px; }
+        .materia-slot {
+            width: 24px; height: 24px; border-radius: 50%;
+            border: 2px solid #fff; transition: 0.2s; cursor: pointer;
+        }
+        .materia-slot.magic { background: radial-gradient(circle, var(--materia-magic), #004411); box-shadow: 0 0 10px var(--materia-magic); }
+        .materia-slot.command { background: radial-gradient(circle, var(--materia-command), #444400); box-shadow: 0 0 10px var(--materia-command); }
+        .materia-slot.summon { background: radial-gradient(circle, var(--materia-summon), #440000); box-shadow: 0 0 10px var(--materia-summon); }
+        .materia-slot.empty { background: rgba(255,255,255,0.1); border: 1px dashed #fff; }
+
+        /* 6. THE BEACON BUTTON */
+        .beacon-btn {
+            margin-top: auto; padding: 18px;
+            background: #dcdcdc; border: 4px outset #fff;
+            color: #000; font-weight: bold; text-transform: uppercase;
+            box-shadow: 4px 4px 0px #222; cursor: pointer;
+        }
+        .beacon-btn:active { border-style: inset; transform: translate(2px, 2px); box-shadow: 1px 1px 0px #222; }
+    </style>
+</head>
+<body>
+
+    <div class="glassway"></div>
+
+    <div class="ff-window">
+        <div class="tile">
+            <div class="cursor-finger">☞</div>
+            <span class="label">NAME ENTRY</span>
+            <input type="text" value="CLOUD_STRIFE">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="tile">
+                <div class="cursor-finger">☞</div>
+                <span class="label">CORE LV</span>
+                <input type="number" value="99">
+            </div>
+            <div class="tile">
+                <div class="cursor-finger">☞</div>
+                <span class="label">HP VALUE</span>
+                <input type="number" value="9999">
+            </div>
+        </div>
+
+        <div class="tile">
+            <div class="cursor-finger">☞</div>
+            <span class="label">EQUIPMENT: BUSTER SWORD</span>
+            <div class="materia-row">
+                <div class="materia-slot magic" data-type="magic" onclick="cycleMateria(this)"></div>
+                <div class="materia-slot magic" data-type="magic" onclick="cycleMateria(this)"></div>
+                <div class="materia-slot command" data-type="command" onclick="cycleMateria(this)"></div>
+                <div class="materia-slot empty" data-type="empty" onclick="cycleMateria(this)"></div>
+            </div>
+        </div>
+
+        <div class="tile" style="flex-grow: 1; overflow-y: auto;">
+            <div class="cursor-finger">☞</div>
+            <span class="label">INVENTORY DROPS</span>
+            <div style="display:flex; justify-content:space-between; margin-top:12px;">
+                <span>ETHER CRYSTAL</span> <span style="color:var(--og-yellow)">x 99</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-top:12px;">
+                <span>PHOENIX PIN</span> <span style="color:var(--og-yellow)">x 05</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-top:12px;">
+                <span>ELIXIR</span> <span style="color:var(--og-yellow)">x 12</span>
+            </div>
+        </div>
+
+        <button class="beacon-btn" onclick="triggerSync(this)">Execute Sync</button>
+    </div>
+
+    <script>
+        // Materia Cycle Logic
+        function cycleMateria(el) {
+            const types = ['empty', 'magic', 'command', 'summon'];
+            let current = el.getAttribute('data-type');
+            let nextIndex = (types.indexOf(current) + 1) % types.length;
+            let nextType = types[nextIndex];
+            
+            el.setAttribute('data-type', nextType);
+            el.className = 'materia-slot ' + nextType;
+            
+            // Visual pop
+            el.style.transform = 'scale(1.2)';
+            setTimeout(() => el.style.transform = 'scale(1)', 150);
+        }
+
+        // Button Sync Logic
+        function triggerSync(btn) {
+            btn.innerText = "SYNCING...";
+            btn.style.filter = "invert(1)";
+            setTimeout(() => {
+                btn.innerText = "EXECUTE SYNC";
+                btn.style.filter = "invert(0)";
+                alert("SYSTEM STATUS UPDATED");
+            }, 1000);
+        }
+    </script>
+
+
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        :root {
+            --window-blue: #3a5a8a;
+            --window-dark: #1a2a4a;
+            --border-light: #88aadd;
+            --text-gold: #f7d308;
+            --crystal-glow: rgba(0, 255, 255, 0.4);
+        }
+
+        body {
+            margin: 0; background: #000;
+            font-family: 'Courier New', Courier, monospace;
+            color: white; overflow: hidden; height: 100vh;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        /* 1. CRYSTAL GLASSWAY BACKGROUND */
+        .glassway-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at top, #664422 0%, #000 70%);
+            z-index: -1;
+        }
+
+        .floor {
+            position: absolute; bottom: 0; width: 200%; height: 60%;
+            background-image: 
+                linear-gradient(var(--crystal-glow) 1px, transparent 1px),
+                linear-gradient(90deg, var(--crystal-glow) 1px, transparent 1px);
+            background-size: 60px 60px;
+            transform: perspective(300px) rotateX(65deg) translateX(-25%);
+            animation: walk 10s linear infinite;
+        }
+        @keyframes walk { 100% { background-position: 0 60px; } }
+
+        /* 2. THE PIXEL MENUS (BEACONS) */
+        .ui-wrapper {
+            width: 90%; max-width: 400px; margin-top: 20px;
+            display: flex; flex-direction: column; gap: 15px;
+            z-index: 10;
+        }
+
+        .pixel-window {
+            background: linear-gradient(180deg, var(--window-blue), var(--window-dark));
+            border: 3px double var(--border-light);
+            border-radius: 4px; padding: 12px;
+            box-shadow: 0 0 0 2px #000, 5px 5px 15px rgba(0,0,0,0.8);
+            position: relative;
+        }
+
+        .window-header {
+            font-size: 0.8rem; letter-spacing: 2px;
+            border-bottom: 1px solid var(--border-light);
+            margin-bottom: 10px; padding-bottom: 5px;
+            display: flex; justify-content: space-between;
+        }
+
+        /* 3. INTERACTIVE BUTTONS (Today, Logs, etc.) */
+        .nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        
+        .btn-pixel {
+            background: rgba(0,0,0,0.3); border: 1px solid var(--border-light);
+            color: white; padding: 10px; font-family: inherit;
+            text-align: left; cursor: pointer; position: relative;
+            outline: none; transition: 0.2s;
+        }
+
+        /* The white cursor finger */
+        .btn-pixel:focus::before {
+            content: '☞'; position: absolute; left: -25px;
+            font-size: 1.5rem; animation: point 0.5s infinite alternate;
+        }
+        @keyframes point { from { transform: translateX(0); } to { transform: translateX(-5px); } }
+
+        /* 4. BEACON INDICATORS (The Orange Flow) */
+        .mood-box {
+            background: rgba(0,0,0,0.4); border-radius: 8px;
+            padding: 15px; text-align: center;
+        }
+
+        .glow-orb {
+            width: 60px; height: 60px; margin: 10px auto;
+            background: radial-gradient(circle, #ffaa00, transparent);
+            border-radius: 50%; animation: breathe 3s infinite ease-in-out;
+            box-shadow: 0 0 20px #ff6600;
+        }
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+
+        .stat-row { display: flex; justify-content: space-between; margin: 8px 0; font-size: 0.9rem; }
+        .tag { background: #555; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; }
+        .tag.active { background: var(--text-gold); color: black; font-weight: bold; }
+
+        /* 5. THE SAVE SPIRE */
+        .save-spire {
+            margin-top: auto; padding: 15px; margin-bottom: 20px;
+            background: #eee; border: 4px outset #fff;
+            color: #000; font-weight: bold; text-transform: uppercase;
+            width: 100%; box-shadow: 4px 4px 0px #333;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glassway-container">
+        <div class="floor"></div>
+    </div>
+
+    <div class="ui-wrapper">
+        <div class="pixel-window">
+            <div class="window-header"><span>BEACONS</span><span>[SELECT]</span></div>
+            <div class="nav-grid">
+                <button class="btn-pixel">TODAY</button>
+                <button class="btn-pixel">LOGS</button>
+                <button class="btn-pixel">BACKPACK</button>
+                <button class="btn-pixel">FLOW</button>
+                <button class="btn-pixel">MONEY</button>
+            </div>
+        </div>
+
+        <div class="pixel-window">
+            <div class="window-header">
+                <span>Sun Jan 04 2026</span>
+                <span style="color:var(--text-gold)">Mood: Orange Flow</span>
+            </div>
+            
+            <div class="mood-box">
+                <div class="glow-orb"></div>
+                <div class="stat-row"><span>WORK</span> <div><span class="tag active">Active</span> <span class="tag">Idle</span></div></div>
+                <div class="stat-row"><span>WEATHER</span> <div><span class="tag">Rain</span> <span class="tag active">Sun</span></div></div>
+                <div class="stat-row"><span>MONEY</span> <div><span class="tag active">Steady</span> <span class="tag">Low</span></div></div>
+            </div>
+        </div>
+
+        <button class="save-spire">SAVE DAY SYNC</button>
+    </div>
+
+</body>
+</html>
+
+</body>
+</html>
