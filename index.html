@@ -10,11 +10,11 @@
   --bg-top:#0b1d33;            /* Top gradient color */
   --bg-bottom:#f5f7fa;         /* Bottom gradient color */
   --mood-color:rgba(255,165,0,0.18); /* Default mood overlay */
-  --panel-bg:rgba(177, 118, 8, 0.589); /* FF-style panel bg */
+  --panel-bg:rgba(148, 121, 32, 0.589); /* FF-style panel bg */
   --panel-border:rgba(255,255,255,0.55);
   --panel-shadow:rgba(0,0,0,0.6);
   --text-main:#ffffff;
-  --text-dim:rgba(24, 112, 194, 0.65);
+  --text-dim:rgba(0, 0, 0, 0.65);
   --highlight-color:rgba(255,255,255,0.15);
 }
 body {
@@ -65,7 +65,7 @@ body {
 #beacon {
   align-self:flex-end; 
   height: 160px;
-  width:160px; 
+  width: 640px;px; 
   border: 2px solid rgba(43, 181, 223, 0.01);
   background:radial-gradient(circle at center,rgba(0, 255, 242, 0.199),rgba(0, 238, 255, 0.05));
   box-shadow:0 0 20px rgba(0, 255, 213, 0.3);
@@ -73,7 +73,7 @@ body {
   border-radius:25px;
   margin-top:20px;
 }
-@keyframes breathe{0%,100%{opacity:0.85;}50%{opacity:1;}}
+@keyframes breathe{0%,100%{opacity:0.55;}50%{opacity:1;}}
 
 /* ----------------- DAY PANELS ----------------- */
 .day-panel{
