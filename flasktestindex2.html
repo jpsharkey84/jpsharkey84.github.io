@@ -13,10 +13,25 @@
         .panel { pointer-events: auto; background: var(--panel-alpha); border: 1px solid rgba(148, 176, 218, 0.3); backdrop-filter: blur(12px); padding: 20px; }
         .directory { grid-column: 1; grid-row: 1; }
         .monitor { grid-column: 3; grid-row: 1; text-align: right; }
-        .terminal { grid-column: 1 / span 3; grid-row: 2; margin-top: 20px; border-top: 2px solid var(--accent); display: flex; flex-direction: column; }
-        #output { flex: 1; font-size: 12px; color: #8899aa; overflow-y: auto; margin-bottom: 10px; }
+        .terminal { grid-column: 1 / span 3; grid-row: 2;
+                   margin-top: 20px;
+                   border-top: 2px solid var(--accent);
+                   display: flex; 
+                   flex-direction: column; }
+        #output { flex: 1;
+                  font-size: 12px;
+                  color: #8899aa; 
+                  overflow-y: auto;
+                  margin-bottom: 10px; }
         .input-line { display: flex; align-items: center; }
-        input { background: transparent; border: none; color: #fff; font-family: 'JetBrains Mono'; font-size: 14px; width: 100%; outline: none; }
+        input { background: transparent;
+               border: none;
+               color: #fff;
+               font-family: 'JetBrains Mono';
+               font-size: 14px;
+               width: 100%; 
+               outline: none; 
+              }
         .stat-label { font-size: 10px; color: var(--primary); display: block; }
         .stat-value { font-size: 18px; font-weight: 500; }
         #hidden-system-form { display: none; }
