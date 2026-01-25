@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+at<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -12,8 +12,8 @@
   --mood-color:rgba(243, 243, 243, 0); /* Default mood overlay */
   --panel-bg:#91c2f0b9; /* FF-style panel bg */
   --panel-border:rgba(255,255,255,0.55);
-  --panel-shadow:rgba(0,0,0,0.6);
-  --text-main:#ffffff;
+  --panel-shadow: rgba(0,0,0,0.0);
+  --text-main: #ffffff;
   --text-dim:rgb(255, 255, 255);
   --highlight-color:rgba(255,255,255,0.15);
 }
@@ -66,7 +66,7 @@ body {
   align-self:flex-end; 
   height: 160px;
   width: 160px; 
-  /*border: 2px solid rgba(238, 238, 238, 0.01);*/
+  border: 2px solid rgba(238, 238, 238, 0.01);
   background:radial-gradient(circle at center,rgba(9, 255, 0, 0.616),rgba(9, 255, 0, 0.05));
   box-shadow:0 0 20px rgba(0, 255, 85, 0.486);
   animation:breathe 6s ease-in-out infinite;
@@ -328,8 +328,6 @@ function init(){
   document.documentElement.style.setProperty('--mood-color',STATE.moodColor);
   updateStatus(currentDate);
   scheduleRollover();
-}
-init();
-</script>
+  </script>
 </body>
   </html>
