@@ -4,6 +4,7 @@ import sqlite3
 
 
 app = Flask(__name__)
+app.config["DATABASE"] = "beacons.db"
 
 @app.route("/", methods=["GET", "POST"])
 def hello_world():
