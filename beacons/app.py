@@ -7,6 +7,9 @@ app = Flask(__name__)
 def hello_world():
     if request.method == "GET":
         return render_template("index.html")
+    elif request.method == "POST":
+        N = request.form.get("NAME")
+        print(N)
 
 current_datetime = datetime.datetime.now()
 print(current_datetime)     
