@@ -9,7 +9,7 @@ def hello_world():
         return render_template("index.html")
     elif request.method == "POST":
         N = request.form.get("NAME")
-        print(N)
+        return N 
 
 current_datetime = datetime.datetime.now()
 print(current_datetime)     
