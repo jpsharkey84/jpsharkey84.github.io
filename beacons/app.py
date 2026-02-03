@@ -11,7 +11,8 @@ def hello_world():
         return render_template("index.html")
     elif request.method == "POST":
         N = request.form.get("NAME")
-        return render_template("index.html", N=N)
+        ZONE = request.form.get("ZONE")
+        return render_template("index.html", N=N,ZONE=ZONE)
 
 current_datetime = datetime.datetime.now()
 print(current_datetime)     
