@@ -14,7 +14,7 @@ def hello_world():
         N = request.form.get("NAME")
         ADDRESS = request.form.get("ADDRESS")
         DAY = request.form.get("day")
-        JOB TYPE = request.form.get("JOB TYPE")
+        JOB_TYPE = request.form.get("JOB_TYPE")
         return render_template("index.html", N=N,ADDRESS=ADDRESS)
 
 current_datetime = datetime.datetime.now()
