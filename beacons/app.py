@@ -13,6 +13,8 @@ def hello_world():
     elif request.method == "POST":
         N = request.form.get("NAME")
         ADDRESS = request.form.get("ADDRESS")
+        DAY = request.form.get("day")
+        JOB TYPE = request.form.get("JOB TYPE")
         return render_template("index.html", N=N,ADDRESS=ADDRESS)
 
 current_datetime = datetime.datetime.now()
