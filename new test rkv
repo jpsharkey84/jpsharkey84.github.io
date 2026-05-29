@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crystal Domain - Beacons</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-dark: #1b263b;
+            --panel-bg: rgba(28, 41, 66, 0.9);
+            --border-light: #5c7596;
+            --border-dark: #0f1622;
+            --text-main: #e2e8f0;
+            --text-dim: #8a9eb7;
+            --accent-gold: #e0a96d;
+            --btn-highlight: #415a77;
+        }
+
+        /* Prevent modern anti-aliasing to preserve clean pixel borders */
+        * {
+            box-sizing: border-box;
+            image-rendering: pixelated;
+            font-smoothing: none;
+            -webkit-font-smoothing: none;
+            -moz-osx-font-smoothing: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            background: #2c3d52; /* Replace with your central pixel art artwork background url() */
+            background-size: cover;
+            background-position: center;
+            font-family: 'VT323', monospace;
+            font-size: 24px;
+            color: var(--text-main);
+            display: flex;
+            align-items: flex-end; /* Keeps HUD grounded on the screen */
+            justify-content: center;
+        }
+
+        /* Responsive Dashboard Container */
+        main {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Media Query: Side-by-side split panels on desktop viewports */
+        @media (min-width: 600px) {
+            main {
+                grid-template-columns: 1fr 1.3fr;
+            }
+        }
+
+        /* Tactile Retro Window Box */
+        .panel {
+            background: var(--panel-bg);
+            border: 4px solid var(--border-dark);
+            box-shadow: inset 2px 2px 0px var(--border-light), 6px 6px 0px rgba(0,0,0,0.4);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border-light);
+            padding-bottom: 6px;
+            margin-bottom: 4px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .panel-title {
+            margin: 0;
+            font-size: 28px;
+            color: var(--text-main);
+        }
+
+        /* Vertical Navigation Panel Component */
+        .nav-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* Rigid Tactile Button Components */
+        .btn {
+            background: var(--panel-bg);
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 22px;
+            border: 3px solid var(--border-dark);
+            box-shadow: inset 2px 2px 0px var(--border-light);
+            padding: 8px 12px;
+            text-align: left;
+            cursor: pointer;
+            width: 100%;
+            display: block;
+        }
+
+        .btn:focus-visible {
+            outline: 3px dashed var(--accent-gold);
+            outline-offset: 2px;
+        }
+
+        /* Active, selected toggles flip structural shading inset */
+        .btn[aria-pressed="true"], .btn:active {
+            background: var(--btn-highlight);
+            box-shadow: inset -2px -2px 0px var(--border-light);
+            color: var(--accent-gold);
+        }
+
+        /* Grid selection options for Matrix settings */
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .matrix-btn {
+            text-align: center;
+            padding: 6px 2px;
+            font-size: 20px;
+        }
+
+        /* Telemetry Stream Output Log Container */
+        .log-stream {
+            background: rgba(10, 15, 26, 0.8);
+            border: 2px solid var(--border-dark);
+            padding: 10px;
+            height: 140px;
+            overflow-y: auto;
+            font-size: 18px;
+            color: #4af626; /* Classic terminal green for stream clarity */
+            border-radius: 0;
+        }
+
+        .log-entry {
+            margin-bottom: 4px;
+            line-height: 1.2;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+
+    <main role="main">
+        
+        <section class="panel" aria-label="Beacons Navigation">
+            <div class="panel-header">
+                <span>✦ Node Select</span>
+                <span>[01]</span>
+            </div>
+            <nav class="nav-group">
+                <button class="btn" aria-pressed="false">TODAY</button>
+                <button class="btn" aria-pressed="true">LOGS</button>
+                <button class="btn" aria-pressed="false">BACKPACK</button>
+                <button class="btn" aria-pressed="false">FLOW</button>
+                <button class="btn" aria-pressed="false">MONEY</button>
+            </nav>
+        </section>
+
+        <section class="panel" aria-label="Status Control Platform">
+            <div class="panel-header">
+                <time id="current-date">SUN JAN 04 2026</time>
+                <span id="system-status">SYS_OK</span>
+            </div>
+            
+            <div style="color: var(--accent-gold); margin-bottom: 4px;">Mood Status Matrix:</div>
+            
+            <div class="matrix-grid" role="group" aria-label="Activity State">
+                <button class="btn matrix-btn" aria-pressed="true">Active</button>
+                <button class="btn matrix-btn" aria-pressed="false">Idle</button>
+                <button class="btn matrix-btn" aria-pressed="false">Paused</button>
+            </div>
+
+            <div class="matrix-grid" role="group" aria-label="Environment State">
+                <button class="btn matrix-btn" aria-pressed="false">Rain</button>
+                <button class="btn matrix-btn" aria-pressed="true">Sun</button>
+                <button class="btn matrix-btn" aria-pressed="false">Grey</button>
+            </div>
+
+            <div style="color: var(--text-dim); margin-top: 4px; font-size: 20px;">Live Hardware Stream:</div>
+            <div class="log-stream" id="pizero-stream" aria-live="polite">
+                <div class="log-entry">[SYSTEM]: Awaiting data sequence input connection...</div>
+            </div>
+
+            <button class="btn" style="text-align: center; margin-top: 8px; color: var(--accent-gold);" id="save-day-btn">
+                SAVE RUNNING INSTANCE
+            </button>
+        </section>
+
+    </main>
+
+    <script>
+        // Simple state handler for tactile interactive buttons
+        document.querySelectorAll('.btn').forEach(button => {
+            button.addEventListener('click', () => {
+                // Handle grouping behavior if part of a matrix selection row
+                const parentGroup = button.closest('.matrix-grid');
+                if (parentGroup) {
+                    parentGroup.querySelectorAll('.btn').forEach(b => b.setAttribute('aria-pressed', 'false'));
+                }
+                button.setAttribute('aria-pressed', button.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+            });
+        });
+
+        // Fetch loop configuration for your Pixero raw environmental log data
+        // For local development or deployment via GitHub Pages website repository
+        const PI_FEED_URL = 'https://raw.githubusercontent.com/sharkey84/sharkey84.github.io/main/pixero_logs.txt';
+
+        async function fetchPiZeroTelemetry() {
+            const streamContainer = document.getElementById('pizero-stream');
+            try {
+                // Appending a timestamp query string handles client-side caching directly
+                const response = await fetch(`${PI_FEED_URL}?t=${Date.now()}`);
+                if (!response.ok) throw new Error(`HTTP Error Status: ${response.status}`);
+                
+                const rawText = await response.text();
+                const logLines = rawText.trim().split('\n');
+                
+                // Clear and update data stream feed visually
+                streamContainer.innerHTML = '';
+                logLines.forEach(line => {
+                    const entry = document.createElement('div');
+                    entry.className = 'log-entry';
+                    entry.textContent = line;
+                    streamContainer.appendChild(entry);
+                });
+                // Force scroll tracking directly down to newest log entries
+                streamContainer.scrollTop = streamContainer.scrollHeight;
+            } catch (error) {
+                console.error('Telemetry pipeline error:', error);
+                // Fail silently/gracefully on UI interface screen
+                const errorEntry = document.createElement('div');
+                errorEntry.className = 'log-entry';
+                errorEntry.style.color = '#ff6b6b';
+                errorEntry.textContent = `[FEED_ERROR]: Disconnected from upstream.`;
+                streamContainer.appendChild(errorEntry);
+            }
+        }
+
+        // Initialize fetch routine on launch, then poll update cycles every 30 seconds
+        fetchPiZeroTelemetry();
+        setInterval(fetchPiZeroTelemetry, 30000);
+    </script>
+</body>
+</html>
