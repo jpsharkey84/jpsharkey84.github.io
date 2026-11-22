@@ -1,0 +1,779 @@
+Here is the updated dashboard with six low-brightness 16×5 LED matrix modes (THERMO, BEACON, SCINTILLATE, TIDAL, EMBER, and LORENZ) plus a custom RGB tint override in the THERMO-LED tab:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>XEROPI × DAILY CHRONICLE // BETA TEST 1</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap');
+
+    :root {
+      --win-top: #1a2b6d;
+      --win-bot: #070d29;
+      --win-border: #d8e4ff;
+      --win-inner: #4d6bb3;
+      --accent: #38bdf8;
+      --gold: #fcd34d;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at 50% 0%, #0f172a 0%, #030612 75%);
+      color: #f1f5f9;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-x: hidden;
+    }
+    .mono { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace; }
+
+    .rpg-win {
+      background: linear-gradient(180deg, var(--win-top) 0%, var(--win-bot) 100%);
+      border: 2px solid var(--win-border);
+      box-shadow: inset 0 0 0 2px var(--win-inner), 0 12px 30px rgba(0, 0, 0, 0.62);
+      border-radius: 8px;
+    }
+    .rpg-sub {
+      background: rgba(3, 7, 20, 0.65);
+      border: 1px solid rgba(216, 228, 255, 0.25);
+      border-radius: 6px;
+    }
+
+    @keyframes cursorBob {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(3px); }
+    }
+    .rpg-cursor {
+      display: inline-block;
+      animation: cursorBob 0.85s infinite ease-in-out;
+      color: var(--gold);
+    }
+
+    .list-row {
+      transition: background 0.14s ease, border-color 0.14s ease;
+      border: 1px solid transparent;
+    }
+    .list-row:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(216, 228, 255, 0.28);
+    }
+    .list-row.selected {
+      background: linear-gradient(90deg, rgba(56, 189, 248, 0.2) 0%, rgba(16, 25, 53, 0.5) 100%);
+      border-color: var(--accent);
+    }
+
+    .tab-btn.active {
+      background: rgba(252, 211, 77, 0.18);
+      border-color: var(--gold);
+      color: #ffffff;
+    }
+
+    .diffuser-grid {
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.14) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.14) 1px, transparent 1px);
+      background-size: 6px 6px;
+      backdrop-filter: blur(5px);
+    }
+    .caustic-aura { transition: background 0.4s ease, opacity 0.4s ease; }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      background: rgba(255, 255, 255, 0.16);
+      height: 6px;
+      border-radius: 999px;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: var(--gold);
+      border: 2px solid #ffffff;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body class="p-2 sm:p-5">
+
+  <div class="max-w-6xl mx-auto space-y-3 sm:space-y-4">
+
+    <!-- TOP MISSION & PARTY HEADER -->
+    <header class="rpg-win p-3 sm:p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-lg rpg-sub flex items-center justify-center text-lg font-bold mono text-amber-300 shrink-0" id="lv-badge">LV1</div>
+        <div class="min-w-0">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]" id="status-dot"></span>
+            <h1 class="text-sm sm:text-lg font-bold tracking-wide text-white mono" id="header-title-display">XEROPI × DAILY CHRONICLE</h1>
+            <span class="text-[10px] mono px-1.5 py-0.5 rounded bg-sky-500/20 border border-sky-400/40 text-sky-200">BETA TEST 1</span>
+            <span class="text-[10px] mono px-1.5 py-0.5 rounded bg-emerald-500/20 border border-emerald-400/40 text-emerald-200" id="header-phase-badge">PHASE: DASH LIVE</span>
+          </div>
+          <p class="text-[11px] text-slate-300 mono truncate" id="header-motto-display">jpsharkey@xeropi • Present Day • Keep moving forward</p>
+          <div class="flex items-center gap-2 mt-1 flex-wrap">
+            <select id="profile-select" class="rpg-sub px-2 py-0.5 text-xs mono text-amber-200 focus:outline-none"></select>
+            <button type="button" id="btn-new-profile" class="px-2 py-0.5 rounded rpg-sub text-[11px] mono text-slate-300 hover:border-amber-300">+ Profile</button>
+            <span class="text-[11px] mono text-emerald-300">MET <strong id="met-clock">000:00:00</strong></span>
+            <span class="text-[11px] mono text-amber-300" id="release-version">v1.4.3</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2.5 justify-between lg:justify-end border-t lg:border-t-0 border-white/15 pt-2 lg:pt-0">
+        <div class="min-w-[130px]">
+          <div class="flex justify-between text-[10px] mono text-amber-200 mb-1">
+            <span>DAILY XP</span>
+            <span id="xp-text">0 / 100</span>
+          </div>
+          <div class="w-full h-2 rounded-full bg-slate-950/80 border border-white/20 overflow-hidden">
+            <div id="xp-bar" class="h-full bg-gradient-to-r from-sky-400 to-amber-300 transition-all duration-300" style="width:0%;"></div>
+          </div>
+        </div>
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <button type="button" id="btn-sfx" class="px-2 py-1.5 rounded rpg-sub text-[11px] mono text-slate-200 hover:border-amber-300">SFX: OFF</button>
+          <button type="button" id="btn-export" class="px-2 py-1.5 rounded rpg-sub text-[11px] mono text-sky-200 hover:border-sky-300">EXPORT SAVE</button>
+          <label class="px-2 py-1.5 rounded rpg-sub text-[11px] mono text-emerald-200 hover:border-emerald-300 cursor-pointer">
+            LOAD
+            <input type="file" id="input-import" accept=".json,application/json" class="hidden" />
+          </label>
+        </div>
+      </div>
+    </header>
+
+    <!-- L / R SHOULDER NAV -->
+    <nav class="rpg-win p-1.5 sm:p-2 flex items-center justify-between gap-1 sm:gap-2" aria-label="Console Tabs">
+      <button type="button" id="btn-tab-l" class="px-2 sm:px-2.5 py-1.5 rounded rpg-sub text-[11px] sm:text-xs font-bold mono text-amber-200 hover:border-amber-300 shrink-0">L</button>
+      <div class="flex items-center gap-1 sm:gap-1.5 flex-1 justify-start sm:justify-center min-w-0 overflow-x-auto">
+        <button type="button" data-tab="panel" id="tab-lbl-panel" class="tab-btn active px-2 sm:px-3 py-1.5 rounded border border-white/20 text-[11px] sm:text-xs font-semibold mono whitespace-nowrap">PANEL</button>
+        <button type="button" data-tab="modes" id="tab-lbl-modes" class="tab-btn px-2 sm:px-3 py-1.5 rounded border border-white/20 text-[11px] sm:text-xs font-semibold mono whitespace-nowrap text-slate-200">MODE SELECT</button>
+        <button type="button" data-tab="quests" id="tab-lbl-quests" class="tab-btn px-2 sm:px-3 py-1.5 rounded border border-white/20 text-[11px] sm:text-xs font-semibold mono whitespace-nowrap text-slate-200">QUESTS</button>
+        <button type="button" data-tab="thermo" id="tab-lbl-thermo" class="tab-btn px-2 sm:px-3 py-1.5 rounded border border-white/20 text-[11px] sm:text-xs font-semibold mono whitespace-nowrap text-slate-200">THERMO-LED</button>
+        <button type="button" data-tab="savepoint" id="tab-lbl-savepoint" class="tab-btn px-2 sm:px-3 py-1.5 rounded border border-white/20 text-[11px] sm:text-xs font-semibold mono whitespace-nowrap text-slate-200">SAVE POINT</button>
+        <button type="button" data-tab="system" id="tab-lbl-system" class="tab-btn px-2 sm:px-3 py-1.5 rounded border border-white/20 text-[11px] sm:text-xs font-semibold mono whitespace-nowrap text-slate-200">SYSTEM</button>
+      </div>
+      <button type="button" id="btn-tab-r" class="px-2 sm:px-2.5 py-1.5 rounded rpg-sub text-[11px] sm:text-xs font-bold mono text-amber-200 hover:border-amber-300 shrink-0">R</button>
+    </nav>
+
+    <!-- ALWAYS-VISIBLE EXPANDED 16x5 LED MATRIX + D-PAD -->
+    <section class="rpg-win p-3 sm:p-4 relative overflow-hidden">
+      <div id="caustic-bg" class="caustic-aura absolute inset-0 opacity-25 pointer-events-none"></div>
+      <div class="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2.5">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-xs font-bold uppercase tracking-wider text-sky-300 mono">Hardware Matrix (16×5 WS2812B)</span>
+          <span class="text-[11px] mono text-slate-300" id="led-behavior-label">Smooth thermodynamic breathing</span>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <label class="inline-flex items-center gap-1.5 text-xs mono text-slate-200 cursor-pointer select-none">
+            <input type="checkbox" id="toggle-diffuser" checked class="accent-sky-400 rounded" />
+            <span>Grid Diffuser</span>
+          </label>
+          <span class="text-[11px] mono px-2 py-0.5 rounded rpg-sub text-sky-200" id="pixel-pos-readout">POS(7, 2)</span>
+          <span class="text-[11px] mono px-2 py-0.5 rounded rpg-sub" id="rgb-readout">RGB(71, 217, 88)</span>
+        </div>
+      </div>
+
+      <div class="relative z-10 flex flex-col md:flex-row items-stretch gap-3">
+        <div class="relative flex-1 rounded-lg p-3 bg-slate-950/90 border border-slate-700/80 overflow-hidden flex items-center justify-center min-h-[155px]">
+          <div id="led-strip" class="grid gap-1.5 w-full items-center justify-items-center" style="grid-template-columns: repeat(16, minmax(0, 1fr));"></div>
+          <div id="diffuser-overlay" class="diffuser-grid absolute inset-0 pointer-events-none transition-opacity duration-200"></div>
+        </div>
+
+        <div class="rpg-sub p-3 flex flex-col items-center justify-center gap-2 shrink-0 md:w-44">
+          <span class="text-[10px] mono uppercase tracking-wider text-slate-400">D-Pad</span>
+          <div class="grid grid-cols-3 gap-1.5 w-28 h-28">
+            <div></div>
+            <button type="button" data-dir="up" class="dpad-btn rpg-sub flex items-center justify-center text-sm font-bold mono text-amber-200 hover:border-amber-300 active:bg-sky-500/30">▲</button>
+            <div></div>
+            <button type="button" data-dir="left" class="dpad-btn rpg-sub flex items-center justify-center text-sm font-bold mono text-amber-200 hover:border-amber-300 active:bg-sky-500/30">◀</button>
+            <button type="button" data-dir="center" class="dpad-btn rpg-sub flex items-center justify-center text-[10px] font-bold mono text-sky-300 hover:border-sky-300">●</button>
+            <button type="button" data-dir="right" class="dpad-btn rpg-sub flex items-center justify-center text-sm font-bold mono text-amber-200 hover:border-amber-300 active:bg-sky-500/30">▶</button>
+            <div></div>
+            <button type="button" data-dir="down" class="dpad-btn rpg-sub flex items-center justify-center text-sm font-bold mono text-amber-200 hover:border-amber-300 active:bg-sky-500/30">▼</button>
+            <div></div>
+          </div>
+          <span class="text-[10px] mono text-slate-400">Arrows / WASD</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB PANELS -->
+    <main class="space-y-3 sm:space-y-4">
+
+      <!-- PANEL -->
+      <section id="tab-panel" class="tab-panel rpg-win p-4 space-y-3">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <h2 class="text-sm font-bold uppercase tracking-wider text-amber-300 mono"><span class="rpg-cursor">▸</span> Status & Telemetry</h2>
+          <span class="text-xs mono text-slate-300" id="clock-readout">--:--:--</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="rpg-sub p-3">
+            <div class="text-[11px] mono text-slate-400">TEMP / HUMIDITY</div>
+            <div class="text-lg font-bold mono text-sky-300 mt-0.5" id="stat-env">68.4°F • 54% RH</div>
+          </div>
+          <div class="rpg-sub p-3">
+            <div class="text-[11px] mono text-slate-400">POWER RAIL</div>
+            <div class="text-lg font-bold mono text-emerald-300 mt-0.5" id="stat-pwr">5.08V • 185mA</div>
+          </div>
+          <div class="rpg-sub p-3">
+            <div class="text-[11px] mono text-slate-400">ACTIVE MODE</div>
+            <div class="text-lg font-bold mono text-amber-200 mt-0.5" id="stat-mode">THERMO</div>
+          </div>
+        </div>
+        <div class="rpg-sub p-3 space-y-2">
+          <div class="text-xs font-semibold mono text-slate-200">Quick XP Log</div>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" data-xp="15" class="xp-btn px-3 py-1.5 rounded rpg-sub text-xs mono text-amber-200 hover:border-amber-300">+15 XP Walk</button>
+            <button type="button" data-xp="25" class="xp-btn px-3 py-1.5 rounded rpg-sub text-xs mono text-sky-200 hover:border-sky-300">+25 XP Bench</button>
+            <button type="button" data-xp="40" class="xp-btn px-3 py-1.5 rounded rpg-sub text-xs mono text-emerald-200 hover:border-emerald-300">+40 XP Milestone</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- MODE SELECT -->
+      <section id="tab-modes" class="tab-panel rpg-win p-4 hidden space-y-2">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <h2 class="text-sm font-bold uppercase tracking-wider text-amber-300 mono"><span class="rpg-cursor">▸</span> Lighting & Telemetry Modes</h2>
+          <span class="text-[11px] mono text-slate-300">Low-Glare 16×5 Presets</span>
+        </div>
+        <div id="mode-list" class="grid grid-cols-1 sm:grid-cols-2 gap-1.5"></div>
+      </section>
+
+      <!-- QUESTS -->
+      <section id="tab-quests" class="tab-panel rpg-win p-4 hidden space-y-3">
+        <div class="flex items-center justify-between gap-2">
+          <h2 class="text-sm font-bold uppercase tracking-wider text-amber-300 mono"><span class="rpg-cursor">▸</span> Daily Quests</h2>
+          <span class="text-xs mono text-slate-300" id="quest-counter">0 / 0 Done</span>
+        </div>
+        <div class="flex gap-2">
+          <input type="text" id="new-quest-input" placeholder="Add quest (+20 XP)..." class="flex-1 rpg-sub px-3 py-1.5 text-xs mono text-white focus:outline-none focus:border-sky-400" />
+          <button type="button" id="btn-add-quest" class="px-3 py-1.5 rounded rpg-sub text-xs font-bold mono text-amber-200 hover:border-amber-300">ADD</button>
+        </div>
+        <div id="quest-list" class="space-y-1.5"></div>
+      </section>
+
+      <!-- THERMO-LED -->
+      <section id="tab-thermo" class="tab-panel rpg-win p-4 hidden space-y-3">
+        <h2 class="text-sm font-bold uppercase tracking-wider text-amber-300 mono"><span class="rpg-cursor">▸</span> Thermo-LED & Custom Tint</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="rpg-sub p-3 space-y-2">
+            <div class="flex justify-between text-xs mono">
+              <span>Brightness Cap</span>
+              <span id="brightness-val" class="text-amber-300">28%</span>
+            </div>
+            <input type="range" id="slider-brightness" min="5" max="100" value="28" class="w-full" />
+          </div>
+          <div class="rpg-sub p-3 space-y-2">
+            <div class="flex justify-between text-xs mono">
+              <span>Simulated Temp (°F)</span>
+              <span id="temp-val" class="text-sky-300">68°F</span>
+            </div>
+            <input type="range" id="slider-temp" min="35" max="100" value="68" class="w-full" />
+          </div>
+          <div class="rpg-sub p-3 space-y-2">
+            <div class="flex justify-between text-xs mono">
+              <span>Wave Speed</span>
+              <span id="speed-val" class="text-emerald-300">1.0×</span>
+            </div>
+            <input type="range" id="slider-speed" min="2" max="25" value="10" class="w-full" />
+          </div>
+          <div class="rpg-sub p-3 flex items-center justify-between gap-3">
+            <label class="inline-flex items-center gap-2 text-xs mono text-slate-200 cursor-pointer">
+              <input type="checkbox" id="toggle-custom-color" class="accent-amber-300 rounded" />
+              <span>Custom Tint Override</span>
+            </label>
+            <input type="color" id="input-custom-color" value="#38bdf8" class="w-9 h-7 rounded bg-transparent border border-white/25 cursor-pointer" />
+          </div>
+        </div>
+      </section>
+
+      <!-- SAVE POINT -->
+      <section id="tab-savepoint" class="tab-panel rpg-win p-4 hidden space-y-3">
+        <h2 class="text-sm font-bold uppercase tracking-wider text-amber-300 mono"><span class="rpg-cursor">▸</span> Save Point & Notes</h2>
+        <textarea id="save-notes" rows="4" class="w-full rpg-sub p-3 text-xs mono text-slate-100 focus:outline-none focus:border-sky-400" placeholder="Field log / node notes..."></textarea>
+        <div class="flex items-center gap-2 flex-wrap">
+          <button type="button" id="btn-save-now" class="px-3 py-1.5 rounded rpg-sub text-xs font-bold mono text-emerald-300 hover:border-emerald-300">COMMIT SAVE</button>
+          <span class="text-xs mono text-slate-400" id="save-status">Auto-saved locally</span>
+        </div>
+      </section>
+
+      <!-- SYSTEM -->
+      <section id="tab-system" class="tab-panel rpg-win p-4 hidden space-y-3">
+        <h2 class="text-sm font-bold uppercase tracking-wider text-amber-300 mono"><span class="rpg-cursor">▸</span> System Config</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <label class="rpg-sub p-3 space-y-1 block">
+            <span class="text-[11px] mono text-slate-400">Header Title</span>
+            <input type="text" id="cfg-title" class="w-full bg-transparent text-xs mono text-white focus:outline-none" />
+          </label>
+          <label class="rpg-sub p-3 space-y-1 block">
+            <span class="text-[11px] mono text-slate-400">Motto Line</span>
+            <input type="text" id="cfg-motto" class="w-full bg-transparent text-xs mono text-white focus:outline-none" />
+          </label>
+        </div>
+        <button type="button" id="btn-reset-profile" class="px-3 py-1.5 rounded rpg-sub text-xs mono text-rose-300 hover:border-rose-400">RESET ACTIVE PROFILE</button>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    const COLS = 16, ROWS = 5, STORAGE_KEY = 'xeropi_chronicle_beta1_v2';
+    const MODES = [
+      { id: 'THERMO', name: 'Thermodynamic Breathing', desc: 'Smooth thermodynamic breathing' },
+      { id: 'BEACON', name: 'Coastal Beacon Sweep', desc: 'Low-lux horizontal beacon pulse' },
+      { id: 'SCINTILLATE', name: 'Horizon Scintillation', desc: 'Subtle starlight shimmer across matrix' },
+      { id: 'TIDAL', name: 'Tidal Crest Wave', desc: 'Rolling cyan-blue sine wave across 16×5 rows' },
+      { id: 'EMBER', name: 'Nocturnal Camp Ember', desc: 'Low-blue warm amber & crimson coals' },
+      { id: 'LORENZ', name: 'Lorenz Attractor Orbit', desc: 'Chaotic butterfly trail mapped onto 16×5 grid' }
+    ];
+
+    const defaultProfile = (name = 'jpsharkey@xeropi') => ({
+      name,
+      title: 'XEROPI × DAILY CHRONICLE',
+      motto: `${name} • Present Day • Keep moving forward`,
+      xp: 0,
+      mode: 'THERMO',
+      brightness: 28,
+      tempF: 68,
+      speed: 1.0,
+      useCustomColor: false,
+      customColor: '#38bdf8',
+      notes: '',
+      quests: [
+        { id: 1, text: 'Check DHT11 & LED rail voltage', xp: 20, done: false },
+        { id: 2, text: 'Evening walk & horizon check', xp: 25, done: false }
+      ]
+    });
+
+    let state = {
+      activeProfile: 'jpsharkey@xeropi',
+      profiles: { 'jpsharkey@xeropi': defaultProfile() },
+      tab: 'panel',
+      cursor: { x: 7, y: 2 },
+      sfx: false,
+      metSeconds: 0
+    };
+
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      if (saved && saved.profiles) state = { ...state, ...saved };
+    } catch (_) {}
+
+    const prof = () => state.profiles[state.activeProfile] || (state.profiles[state.activeProfile] = defaultProfile(state.activeProfile));
+    const saveState = () => {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (_) {}
+      const el = document.getElementById('save-status');
+      if (el) el.textContent = `Saved ${new Date().toLocaleTimeString()}`;
+    };
+
+    let audioCtx = null;
+    function beep(freq = 660, dur = 0.045) {
+      if (!state.sfx) return;
+      try {
+        audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'square';
+        osc.frequency.value = freq;
+        gain.gain.value = 0.04;
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + dur);
+      } catch (_) {}
+    }
+
+    const ledStrip = document.getElementById('led-strip');
+    const cells = [];
+    for (let y = 0; y < ROWS; y++) {
+      for (let x = 0; x < COLS; x++) {
+        const d = document.createElement('div');
+        d.className = 'w-full aspect-square rounded-sm border border-white/10 transition-colors duration-75 cursor-pointer';
+        d.dataset.x = x;
+        d.dataset.y = y;
+        d.addEventListener('click', () => {
+          state.cursor = { x, y };
+          beep(740);
+          updateCursorReadouts();
+        });
+        ledStrip.appendChild(d);
+        cells.push(d);
+      }
+    }
+
+    function hexToRgb(hex) {
+      const clean = (hex || '#38bdf8').replace('#', '');
+      const num = parseInt(clean.length === 3 ? clean.split('').map(c => c + c).join('') : clean, 16) || 0x38bdf8;
+      return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
+    }
+
+    function tempToRgb(tempF) {
+      const t = Math.max(0, Math.min(1, (tempF - 35) / 65));
+      return [
+        Math.round(40 + t * 215),
+        Math.round(180 - Math.abs(t - 0.5) * 140),
+        Math.round(245 - t * 210)
+      ];
+    }
+
+    function updateCursorReadouts() {
+      const { x, y } = state.cursor;
+      document.getElementById('pixel-pos-readout').textContent = `POS(${x}, ${y})`;
+    }
+
+    // Lorenz attractor state + trail buffer for 16x5 matrix
+    let lorenz = { x: 0.1, y: 0.0, z: 0.0 };
+    const lorenzTrail = new Float32Array(COLS * ROWS);
+
+    let phase = 0;
+    function renderMatrix() {
+      const p = prof();
+      const spd = p.speed || 1.0;
+      phase += 0.045 * spd;
+      const cap = (p.brightness || 28) / 100;
+      const [baseR, baseG, baseB] = p.useCustomColor ? hexToRgb(p.customColor) : tempToRgb(p.tempF || 68);
+
+      if (p.mode === 'LORENZ') {
+        for (let i = 0; i < lorenzTrail.length; i++) lorenzTrail[i] *= 0.93;
+        const dt = 0.012 * spd;
+        const dx = 10 * (lorenz.y - lorenz.x) * dt;
+        const dy = (lorenz.x * (28 - lorenz.z) - lorenz.y) * dt;
+        const dz = (lorenz.x * lorenz.y - (8 / 3) * lorenz.z) * dt;
+        lorenz.x += dx; lorenz.y += dy; lorenz.z += dz;
+        const gx = Math.max(0, Math.min(COLS - 1, Math.round(((lorenz.x + 20) / 40) * (COLS - 1))));
+        const gy = Math.max(0, Math.min(ROWS - 1, Math.round(((lorenz.z - 5) / 42) * (ROWS - 1))));
+        lorenzTrail[gy * COLS + gx] = 1.0;
+      }
+
+      let auraR = Math.round(baseR * cap);
+      let auraG = Math.round(baseG * cap);
+      let auraB = Math.round(baseB * cap);
+
+      for (let y = 0; y < ROWS; y++) {
+        for (let x = 0; x < COLS; x++) {
+          const idx = y * COLS + x;
+          let r = baseR, g = baseG, b = baseB, mod = 1.0;
+
+          if (p.mode === 'THERMO') {
+            mod = 0.55 + 0.45 * Math.sin(phase);
+          } else if (p.mode === 'BEACON') {
+            const center = (Math.sin(phase * 0.6) * 0.5 + 0.5) * (COLS - 1);
+            const dist = Math.abs(x - center);
+            mod = Math.max(0.18, 1 - dist / 4.8);
+          } else if (p.mode === 'SCINTILLATE') {
+            const hash = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
+            const offset = hash - Math.floor(hash);
+            mod = 0.25 + 0.75 * Math.pow(0.5 + 0.5 * Math.sin(phase * 1.3 + offset * 6.283), 2);
+          } else if (p.mode === 'TIDAL') {
+            const crestY = 2.0 + Math.sin(x * 0.48 - phase * 1.1) * 1.65;
+            const dist = Math.abs(y - crestY);
+            mod = Math.max(0.16, 1 - dist * 0.34);
+            if (!p.useCustomColor) {
+              const mix = Math.max(0, 1 - dist * 0.45);
+              r = Math.round(18 + mix * 45);
+              g = Math.round(115 + mix * 125);
+              b = Math.round(195 + mix * 60);
+            }
+          } else if (p.mode === 'EMBER') {
+            const flicker = 0.45 + 0.55 * Math.sin(phase * 1.7 + x * 1.3 + y * 2.1) * Math.cos(phase * 0.9 - y);
+            mod = Math.max(0.22, Math.abs(flicker));
+            if (!p.useCustomColor) {
+              r = 255;
+              g = Math.round(58 + mod * 88);
+              b = Math.round(6 + mod * 12);
+            }
+          } else if (p.mode === 'LORENZ') {
+            mod = Math.max(0.12, lorenzTrail[idx]);
+          }
+
+          const outR = Math.min(255, Math.round(r * cap * mod));
+          const outG = Math.min(255, Math.round(g * cap * mod));
+          const outB = Math.min(255, Math.round(b * cap * mod));
+
+          const el = cells[idx];
+          el.style.backgroundColor = `rgb(${outR}, ${outG}, ${outB})`;
+          const isCur = x === state.cursor.x && y === state.cursor.y;
+          el.style.outline = isCur ? '2px solid #fcd34d' : 'none';
+          if (isCur) {
+            document.getElementById('rgb-readout').textContent = `RGB(${outR}, ${outG}, ${outB})`;
+            auraR = outR; auraG = outG; auraB = outB;
+          }
+        }
+      }
+
+      document.getElementById('caustic-bg').style.background =
+        `radial-gradient(circle at 50% 45%, rgba(${auraR}, ${auraG}, ${auraB}, 0.65), transparent 72%)`;
+      requestAnimationFrame(renderMatrix);
+    }
+
+    const tabs = ['panel', 'modes', 'quests', 'thermo', 'savepoint', 'system'];
+    function setTab(name) {
+      if (!tabs.includes(name)) return;
+      state.tab = name;
+      beep(580);
+      tabs.forEach(t => {
+        document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== name);
+        document.getElementById(`tab-lbl-${t}`).classList.toggle('active', t === name);
+      });
+      renderAll();
+    }
+
+    function moveCursor(dir) {
+      const { x, y } = state.cursor;
+      if (dir === 'up') state.cursor.y = (y + ROWS - 1) % ROWS;
+      if (dir === 'down') state.cursor.y = (y + 1) % ROWS;
+      if (dir === 'left') state.cursor.x = (x + COLS - 1) % COLS;
+      if (dir === 'right') state.cursor.x = (x + 1) % COLS;
+      if (dir === 'center') {
+        const idx = tabs.indexOf(state.tab);
+        setTab(tabs[(idx + 1) % tabs.length]);
+      } else {
+        beep(690);
+        updateCursorReadouts();
+      }
+    }
+
+    function addXp(amount) {
+      const p = prof();
+      p.xp = (p.xp || 0) + amount;
+      beep(880, 0.07);
+      saveState();
+      renderAll();
+    }
+
+    function renderHeaderOnly() {
+      const p = prof();
+      document.getElementById('header-title-display').textContent = p.title || 'XEROPI × DAILY CHRONICLE';
+      document.getElementById('header-motto-display').textContent = p.motto || '';
+    }
+
+    function renderAll() {
+      const p = prof();
+      const lv = Math.floor((p.xp || 0) / 100) + 1;
+      const curXp = (p.xp || 0) % 100;
+      document.getElementById('lv-badge').textContent = `LV${lv}`;
+      document.getElementById('xp-text').textContent = `${curXp} / 100`;
+      document.getElementById('xp-bar').style.width = `${curXp}%`;
+      renderHeaderOnly();
+      document.getElementById('stat-env').textContent = `${p.tempF}°F • 54% RH`;
+      document.getElementById('stat-mode').textContent = p.mode;
+      document.getElementById('slider-brightness').value = p.brightness;
+      document.getElementById('brightness-val').textContent = `${p.brightness}%`;
+      document.getElementById('slider-temp').value = p.tempF;
+      document.getElementById('temp-val').textContent = `${p.tempF}°F`;
+      document.getElementById('slider-speed').value = Math.round((p.speed || 1.0) * 10);
+      document.getElementById('speed-val').textContent = `${(p.speed || 1.0).toFixed(1)}×`;
+      document.getElementById('toggle-custom-color').checked = Boolean(p.useCustomColor);
+      document.getElementById('input-custom-color').value = p.customColor || '#38bdf8';
+      document.getElementById('save-notes').value = p.notes || '';
+      document.getElementById('cfg-title').value = p.title || '';
+      document.getElementById('cfg-motto').value = p.motto || '';
+      document.getElementById('btn-sfx').textContent = `SFX: ${state.sfx ? 'ON' : 'OFF'}`;
+
+      const modeObj = MODES.find(m => m.id === p.mode) || MODES[0];
+      document.getElementById('led-behavior-label').textContent = modeObj.desc;
+
+      const sel = document.getElementById('profile-select');
+      sel.innerHTML = '';
+      Object.keys(state.profiles).forEach(k => {
+        const opt = document.createElement('option');
+        opt.value = k;
+        opt.textContent = k;
+        opt.selected = k === state.activeProfile;
+        sel.appendChild(opt);
+      });
+
+      const modeList = document.getElementById('mode-list');
+      modeList.innerHTML = MODES.map(m => `
+        <button type="button" data-mode="${m.id}" class="mode-row list-row w-full text-left px-3 py-2 rounded flex items-center justify-between gap-2 ${p.mode === m.id ? 'selected' : ''}">
+          <div class="min-w-0">
+            <div class="text-xs font-bold mono text-white truncate">${m.name}</div>
+            <div class="text-[11px] text-slate-300 truncate">${m.desc}</div>
+          </div>
+          <span class="text-[11px] mono text-amber-300 shrink-0">${p.mode === m.id ? 'ACTIVE' : m.id}</span>
+        </button>
+      `).join('');
+
+      const qList = document.getElementById('quest-list');
+      const quests = p.quests || [];
+      const doneCount = quests.filter(q => q.done).length;
+      document.getElementById('quest-counter').textContent = `${doneCount} / ${quests.length} Done`;
+      qList.innerHTML = '';
+      quests.forEach(q => {
+        const row = document.createElement('div');
+        row.className = `list-row px-3 py-2 rounded flex items-center justify-between gap-2 ${q.done ? 'opacity-60' : ''}`;
+        const lbl = document.createElement('label');
+        lbl.className = 'flex items-center gap-2 text-xs mono cursor-pointer flex-1';
+        const chk = document.createElement('input');
+        chk.type = 'checkbox';
+        chk.dataset.qid = String(q.id);
+        chk.className = 'quest-chk accent-amber-300';
+        chk.checked = Boolean(q.done);
+        const span = document.createElement('span');
+        span.textContent = q.text;
+        if (q.done) span.className = 'line-through';
+        const xpTag = document.createElement('span');
+        xpTag.className = 'text-[11px] mono text-sky-300';
+        xpTag.textContent = `+${q.xp || 20} XP`;
+        lbl.append(chk, span);
+        row.append(lbl, xpTag);
+        qList.appendChild(row);
+      });
+    }
+
+    document.querySelectorAll('[data-tab]').forEach(btn => btn.addEventListener('click', () => setTab(btn.dataset.tab)));
+    document.getElementById('btn-tab-l').addEventListener('click', () => setTab(tabs[(tabs.indexOf(state.tab) + tabs.length - 1) % tabs.length]));
+    document.getElementById('btn-tab-r').addEventListener('click', () => setTab(tabs[(tabs.indexOf(state.tab) + 1) % tabs.length]));
+
+    document.querySelectorAll('.dpad-btn').forEach(btn => btn.addEventListener('click', () => moveCursor(btn.dataset.dir)));
+    document.addEventListener('keydown', e => {
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
+      const map = { ArrowUp: 'up', w: 'up', ArrowDown: 'down', s: 'down', ArrowLeft: 'left', a: 'left', ArrowRight: 'right', d: 'right', Enter: 'center' };
+      if (map[e.key]) { e.preventDefault(); moveCursor(map[e.key]); }
+    });
+
+    document.getElementById('toggle-diffuser').addEventListener('change', e => {
+      document.getElementById('diffuser-overlay').style.opacity = e.target.checked ? '1' : '0';
+    });
+
+    document.querySelectorAll('.xp-btn').forEach(btn => btn.addEventListener('click', () => addXp(Number(btn.dataset.xp))));
+    document.getElementById('mode-list').addEventListener('click', e => {
+      const row = e.target.closest('.mode-row');
+      if (!row) return;
+      prof().mode = row.dataset.mode;
+      beep(620);
+      saveState();
+      renderAll();
+    });
+
+    document.getElementById('btn-add-quest').addEventListener('click', () => {
+      const inp = document.getElementById('new-quest-input');
+      const text = inp.value.trim();
+      if (!text) return;
+      prof().quests.push({ id: Date.now(), text, xp: 20, done: false });
+      inp.value = '';
+      saveState();
+      renderAll();
+    });
+
+    document.getElementById('quest-list').addEventListener('change', e => {
+      if (!e.target.classList.contains('quest-chk')) return;
+      const q = prof().quests.find(item => String(item.id) === e.target.dataset.qid);
+      if (!q) return;
+      q.done = e.target.checked;
+      if (q.done) addXp(q.xp || 20);
+      else { saveState(); renderAll(); }
+    });
+
+    document.getElementById('slider-brightness').addEventListener('input', e => {
+      prof().brightness = Number(e.target.value);
+      document.getElementById('brightness-val').textContent = `${prof().brightness}%`;
+      saveState();
+    });
+    document.getElementById('slider-temp').addEventListener('input', e => {
+      prof().tempF = Number(e.target.value);
+      document.getElementById('temp-val').textContent = `${prof().tempF}°F`;
+      document.getElementById('stat-env').textContent = `${prof().tempF}°F • 54% RH`;
+      saveState();
+    });
+    document.getElementById('slider-speed').addEventListener('input', e => {
+      prof().speed = Number(e.target.value) / 10;
+      document.getElementById('speed-val').textContent = `${prof().speed.toFixed(1)}×`;
+      saveState();
+    });
+    document.getElementById('toggle-custom-color').addEventListener('change', e => {
+      prof().useCustomColor = e.target.checked;
+      saveState();
+    });
+    document.getElementById('input-custom-color').addEventListener('input', e => {
+      prof().customColor = e.target.value;
+      prof().useCustomColor = true;
+      document.getElementById('toggle-custom-color').checked = true;
+      saveState();
+    });
+
+    document.getElementById('btn-save-now').addEventListener('click', () => {
+      prof().notes = document.getElementById('save-notes').value;
+      beep(780);
+      saveState();
+    });
+
+    document.getElementById('cfg-title').addEventListener('input', e => { prof().title = e.target.value; saveState(); renderHeaderOnly(); });
+    document.getElementById('cfg-motto').addEventListener('input', e => { prof().motto = e.target.value; saveState(); renderHeaderOnly(); });
+
+    document.getElementById('profile-select').addEventListener('change', e => {
+      state.activeProfile = e.target.value;
+      saveState();
+      renderAll();
+    });
+    document.getElementById('btn-new-profile').addEventListener('click', () => {
+      const name = prompt('Profile handle:', 'node2@xeropi');
+      if (!name || !name.trim()) return;
+      const clean = name.trim().replace(/[^\w@.-]/g, '').slice(0, 32);
+      if (!clean) return;
+      if (!state.profiles[clean]) state.profiles[clean] = defaultProfile(clean);
+      state.activeProfile = clean;
+      saveState();
+      renderAll();
+    });
+    document.getElementById('btn-reset-profile').addEventListener('click', () => {
+      state.profiles[state.activeProfile] = defaultProfile(state.activeProfile);
+      saveState();
+      renderAll();
+    });
+
+    document.getElementById('btn-sfx').addEventListener('click', () => { state.sfx = !state.sfx; beep(700); saveState(); renderAll(); });
+    document.getElementById('btn-export').addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'xeropi-chronicle-save.json';
+      a.click();
+    });
+    document.getElementById('input-import').addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const parsed = JSON.parse(reader.result);
+          if (parsed && parsed.profiles && typeof parsed.profiles === 'object') {
+            state = { ...state, ...parsed };
+            if (!state.profiles[state.activeProfile]) {
+              state.activeProfile = Object.keys(state.profiles)[0] || 'jpsharkey@xeropi';
+            }
+            saveState();
+            renderAll();
+          }
+        } catch (_) {}
+      };
+      reader.readAsText(file);
+    });
+
+    setInterval(() => {
+      state.metSeconds += 1;
+      const h = String(Math.floor(state.metSeconds / 3600)).padStart(3, '0');
+      const m = String(Math.floor((state.metSeconds % 3600) / 60)).padStart(2, '0');
+      const s = String(state.metSeconds % 60).padStart(2, '0');
+      document.getElementById('met-clock').textContent = `${h}:${m}:${s}`;
+      document.getElementById('clock-readout').textContent = new Date().toLocaleTimeString();
+    }, 1000);
+
+    updateCursorReadouts();
+    renderAll();
+    requestAnimationFrame(renderMatrix);
+  </script>
+</body>
+</html>
+
+What Was Added
+ * 3 New Low-Glare Matrix Modes (MODE SELECT):
+   * TIDAL (Tidal Crest Wave): Smooth cyan-blue sine crest rolling across the 5 vertical rows.
+   * EMBER (Nocturnal Camp Ember): Warm amber-crimson coal flicker with minimal blue channel output for dark-room eye comfort.
+   * LORENZ (Lorenz Attractor Orbit): Real-time Euler integration of the Lorenz system mapped onto 16×5 with a fading phosphor trail.
+ * THERMO-LED Controls: Added a Wave Speed slider (0.2× to 2.5×) and a Custom Tint Override color picker so any wave pattern can be tinted to a single custom RGB value while staying capped under the brightness slider.
+ * Stability Fixes: Sanitized profile handles, prevented full DOM list rebuilds on header text keystrokes, and ensured LOAD validates activeProfile.
