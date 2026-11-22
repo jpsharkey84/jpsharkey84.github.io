@@ -1,0 +1,186 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>XEROPI × DAILY CHRONICLE // BETA TEST 1</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap');
+
+    :root {
+      --win-top: #1a2b6d;
+      --win-bot: #070d29;
+      --win-border: #d8e4ff;
+      --win-inner: #4d6bb3;
+      --accent: #38bdf8;
+      --gold: #fcd34d;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at 50% 0%, #0f172a 0%, #030612 75%);
+      color: #f1f5f9;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-x: hidden;
+    }
+    .mono { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace; }
+
+    .rpg-win {
+      background: linear-gradient(180deg, var(--win-top) 0%, var(--win-bot) 100%);
+      border: 2px solid var(--win-border);
+      box-shadow: inset 0 0 0 2px var(--win-inner), 0 12px 30px rgba(0, 0, 0, 0.62);
+      border-radius: 8px;
+    }
+    .rpg-sub {
+      background: rgba(3, 7, 20, 0.65);
+      border: 1px solid rgba(216, 228, 255, 0.25);
+      border-radius: 6px;
+    }
+
+    @keyframes cursorBob {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(3px); }
+    }
+    .rpg-cursor {
+      display: inline-block;
+      animation: cursorBob 0.85s infinite ease-in-out;
+      color: var(--gold);
+    }
+
+    .list-row {
+      transition: background 0.14s ease, border-color 0.14s ease;
+      border: 1px solid transparent;
+    }
+    .list-row:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(216, 228, 255, 0.28);
+    }
+    .list-row.selected {
+      background: linear-gradient(90deg, rgba(56, 189, 248, 0.2) 0%, rgba(16, 25, 53, 0.5) 100%);
+      border-color: var(--accent);
+    }
+
+    .tab-btn.active {
+      background: rgba(252, 211, 77, 0.18);
+      border-color: var(--gold);
+      color: #ffffff;
+    }
+
+    .diffuser-grid {
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.14) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.14) 1px, transparent 1px);
+      background-size: 6px 6px;
+      backdrop-filter: blur(5px);
+    }
+    .caustic-aura { transition: background 0.4s ease, opacity 0.4s ease; }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      background: rgba(255, 255, 255, 0.16);
+      height: 6px;
+      border-radius: 999px;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: var(--gold);
+      border: 2px solid #ffffff;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body class="p-2 sm:p-5">
+
+  <div class="max-w-6xl mx-auto space-y-3 sm:space-y-4">
+
+    <!-- TOP MISSION & PARTY HEADER -->
+    <header class="rpg-win p-3 sm:p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-lg rpg-sub flex items-center justify-center text-lg font-bold mono text-amber-300 shrink-0" id="lv-badge">LV1</div>
+        <div class="min-w-0">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]" id="status-dot"></span>
+            <h1 class="text-sm sm:text-lg font-bold tracking-wide text-white mono" id="header-title-display">XEROPI × DAILY CHRONICLE</h1>
+            <span class="text-[10px] mono px-1.5 py-0.5 rounded bg-sky-500/20 border border-sky-400/40 text-sky-200">BETA TEST 1</span>
+            <span class="text-[10px] mono px-1.5 py-0.5 rounded bg-emerald-500/20 border border-emerald-400/40 text-emerald-200" id="header-phase-badge">PHASE: DASH LIVE</span>
+          </div>
+          <p class="text-[11px] text-slate-300 mono truncate" id="header-motto-display">jpsharkey@xeropi • Present Day • Keep moving forward</p>
+          <div class="flex items-center gap-2 mt-1 flex-wrap">
+            <select id="profile-select" class="rpg-sub px-2 py-0.5 text-xs mono text-amber-200 focus:outline-none"></select>
+            <button type="button" id="btn-new-profile" class="px-2 py-0.5 rounded rpg-sub text-[11px] mono text-slate-300 hover:border-amber-300">+ Profile</button>
+            <span class="text-[11px] mono text-emerald-300">MET <strong id="met-clock">000:00:00</strong></span>
+            <span class="text-[11px] mono text-amber-300" id="release-version">v1.4.2</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2.5 justify-between lg:justify-end border-t lg:border-t-0 border-white/15 pt-2 lg:pt-0">
+        <div class="min-w-[130px]">
+          <div class="flex justify-between text-[10px] mono text-amber-200 mb-1">
+            <span>DAILY XP</span>
+            <span id="xp-text">0 / 100</span>
+          </div>
+          <div class="w-full h-2 rounded-full bg-slate-950/80 border border-white/20 overflow-hidden">
+            <div id="xp-bar" class="h-full bg-gradient-to-r from-sky-400 to-amber-300 transition-all duration-300" style="width:0%;"></div>
+          </div>
+        </div>
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <button type="button" id="btn-sfx" class="px-2 py-1.5 rounded rpg-sub text-[11px] mono text-slate-200 hover:border-amber-300">SFX: OFF</button>
+          <button type="button" id="btn-export" class="px-2 py-1.5 rounded rpg-sub text-[11px] mono text-sky-200 hover:border-sky-300">EXPORT SAVE</button>
+          <label class="px-2 py-1.5 rounded rpg-sub text-[11px] mono text-emerald-200 hover:border-emerald-300 cursor-pointer">
+            LOAD
+            <input type="file" id="input-import" accept=".json,application/json" class="hidden" />
+          </label>
+        </div>
+      </div>
+    </header>
+
+    <!-- L / R SHOULDER NAV (TIGHT MOBILE BUMPERS) -->
+    <nav class="rpg-win p-1.5 sm:p-2 flex items-center justify-between gap-1 sm:gap-2" aria-label="Console Tabs">
+      <button type="button" id="btn-tab-l" class="px-2 sm:px-2.5 py-1.5 rounded rpg-sub text-[11px] sm:text-xs font-bold mono text-amber-200 hover:border-amber-300 shrink-0">L</button>
+      <div class="flex items-center gap-1 sm:gap-1.5 flex-1 justify-start sm:justify-center min-w-0 overflow-x-auto">
+        <button type="button" data-tab="panel" id="tab-lbl-panel" class="tab-btn active px-2 sm:px-3 py-1.5 rounded border border-white/20 text-[11px] sm:text-xs font-semibold mono whitespace-nowrap">PANEL</button>
+        <button type="button" data-tab="modes" id="tab-lbl-modes" class="tab-btn px-2 sm:px-3 py-1.5 rounded border border-white/20 text-[11px] sm:text-xs font-semibold mono whitespace-nowrap text-slate-200">MODE SELECT</button>
+        <button type="button" data-tab="quests" id="tab-lbl-quests" class="tab-btn px-2 sm:px-3 py-1.5 rounded border border-white/20 text-[11px] sm:text-xs font-semibold mono whitespace-nowrap text-slate-200">QUESTS</button>
+        <button type="button" data-tab="thermo" id="tab-lbl-thermo" class="tab-btn px-2 sm:px-3 py-1.5 rounded border border-white/20 text-[11px] sm:text-xs font-semibold mono whitespace-nowrap text-slate-200">THERMO-LED</button>
+        <button type="button" data-tab="savepoint" id="tab-lbl-savepoint" class="tab-btn px-2 sm:px-3 py-1.5 rounded border border-white/20 text-[11px] sm:text-xs font-semibold mono whitespace-nowrap text-slate-200">SAVE POINT</button>
+        <button type="button" data-tab="system" id="tab-lbl-system" class="tab-btn px-2 sm:px-3 py-1.5 rounded border border-white/20 text-[11px] sm:text-xs font-semibold mono whitespace-nowrap text-slate-200">SYSTEM</button>
+      </div>
+      <button type="button" id="btn-tab-r" class="px-2 sm:px-2.5 py-1.5 rounded rpg-sub text-[11px] sm:text-xs font-bold mono text-amber-200 hover:border-amber-300 shrink-0">R</button>
+    </nav>
+
+    <!-- ALWAYS-VISIBLE EXPANDED 16x5 LED MATRIX + D-PAD -->
+    <section class="rpg-win p-3 sm:p-4 relative overflow-hidden">
+      <div id="caustic-bg" class="caustic-aura absolute inset-0 opacity-25 pointer-events-none"></div>
+      <div class="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2.5">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-xs font-bold uppercase tracking-wider text-sky-300 mono">Hardware Matrix (16×5 WS2812B)</span>
+          <span class="text-[11px] mono text-slate-300" id="led-behavior-label">Smooth thermodynamic breathing</span>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <label class="inline-flex items-center gap-1.5 text-xs mono text-slate-200 cursor-pointer select-none">
+            <input type="checkbox" id="toggle-diffuser" checked class="accent-sky-400 rounded" />
+            <span>Grid Diffuser</span>
+          </label>
+          <span class="text-[11px] mono px-2 py-0.5 rounded rpg-sub text-sky-200" id="pixel-pos-readout">POS(7, 2)</span>
+          <span class="text-[11px] mono px-2 py-0.5 rounded rpg-sub" id="rgb-readout">RGB(71, 217, 88)</span>
+        </div>
+      </div>
+
+      <div class="relative z-10 flex flex-col md:flex-row items-stretch gap-3">
+        <div class="relative flex-1 rounded-lg p-3 bg-slate-950/90 border border-slate-700/80 overflow-hidden flex items-center justify-center min-h-[155px]">
+          <div id="led-strip" class="grid gap-1.5 w-full items-center justify-items-center" style="grid-template-columns: repeat(16, minmax(0, 1fr));"></div>
+          <div id="diffuser-overlay" class="diffuser-grid absolute inset-0 pointer-events-none transition-opacity duration-200"></div>
+        </div>
+
+        <div class="rpg-sub 
