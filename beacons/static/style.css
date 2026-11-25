@@ -1,3 +1,14 @@
+:root {
+    --beacon1: #00E5FF;
+    --dark-bg: #3B3D42;
+    --page-bg: #4B596A;
+    --nav-bg: rgba(13, 27, 42, 0.95);
+    --accent: #00ffcc;
+    --menu-bg: #1a1d24;
+    --text-main: #e2e8f0;
+}
+
 body {
     text-align: center;
+    background-color: var(--dark-bg);
 }
