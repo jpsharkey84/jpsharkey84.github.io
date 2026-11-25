@@ -11,4 +11,5 @@
 body {
     text-align: center;
     background-color: var(--dark-bg);
+    color: var(--text-main);
 }
