@@ -11,5 +11,14 @@
 body {
     text-align: center;
     background-color: var(--dark-bg);
+}
+
+form {
     color: var(--text-main);
+    border: 2px solid var(--beacon1);
+    border-radius: 5px;
+}
+
+form.input {
+    background-color: var(--menu-bg);
 }
