@@ -9,7 +9,7 @@
 }
 
 body {
-    text-align: center;
+    margin: puxels 120
     background-color: var(--dark-bg);
 }
 
