@@ -9,7 +9,7 @@
 }
 
 body {
-    margin: puxels 120
+    margin: 120px;
     background-color: var(--dark-bg);
 }
 
