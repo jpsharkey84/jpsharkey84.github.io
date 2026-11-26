@@ -22,3 +22,7 @@ form {
 form.input {
     background-color: var(--menu-bg);
 }
+
+.formBtn {
+    background-color: var(--menu-bg);
+}
