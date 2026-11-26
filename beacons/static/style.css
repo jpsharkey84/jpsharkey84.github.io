@@ -1,0 +1,28 @@
+:root {
+    --beacon1: #00E5FF;
+    --dark-bg: #3B3D42;
+    --page-bg: #4B596A;
+    --nav-bg: rgba(13, 27, 42, 0.95);
+    --accent: #00ffcc;
+    --menu-bg: #1a1d24;
+    --text-main: #e2e8f0;
+}
+
+body {
+    margin: puxels 120
+    background-color: var(--dark-bg);
+}
+
+form {
+    color: var(--text-main);
+    border: 2px solid var(--beacon1);
+    border-radius: 5px;
+}
+
+form.input {
+    background-color: var(--menu-bg);
+}
+
+.formBtn {
+    background-color: var(--menu-bg);
+}
